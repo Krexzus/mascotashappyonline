@@ -1,12 +1,1 @@
-[
-  {"id":1, "nombre":"Krypto", "tipo":"Perro", "superpoder":"Volar"},
-  {"id":2, "nombre":"Dex-Starr", "tipo":"Gato", "superpoder":"Rayo de ira"},
-  {"id":3, "nombre":"Ace", "tipo":"Perro", "superpoder":"Inteligencia táctica"},
-  {"id":4, "nombre":"Lockjaw", "tipo":"Perro", "superpoder":"Teletransportación"},
-  {"id":5, "nombre":"Comet", "tipo":"Caballo", "superpoder":"Supervelocidad"},
-  {"id":6, "nombre":"Redwing", "tipo":"Halcón", "superpoder":"Vínculo telepático"},
-  {"id":7, "nombre":"Jumpa", "tipo":"Canguro", "superpoder":"Fuerza aumentada"},
-  {"id":8, "nombre":"Streaky", "tipo":"Gato", "superpoder":"Superfuerza"},
-  {"id":9, "nombre":"Bat-Cow", "tipo":"Vaca", "superpoder":"Resistencia"},
-  {"id":10, "nombre":"Ch'p", "tipo":"Ardilla", "superpoder":"Anillo de poder"}
-]
+[{"id":1,"nombre":"Krypto","tipo":"Perro","superpoder":"Volar","felicidad":85,"vida":92,"personalidad":"normal","enfermedades":[],"items":[{"nombre":"Capa","tipo":"pay"}]},{"id":2,"nombre":"Dex-Starr","tipo":"Gato","superpoder":"Rayo de ira","felicidad":100,"vida":100,"personalidad":"normal","enfermedades":[],"items":[{"nombre":"Sombrero","tipo":"free"}]},{"id":3,"nombre":"Ace","tipo":"Perro","superpoder":"Inteligencia táctica","felicidad":100,"vida":100,"personalidad":"normal","enfermedades":[],"items":[]},{"id":4,"nombre":"Lockjaw","tipo":"Perro","superpoder":"Teletransportación","felicidad":100,"vida":100,"personalidad":"normal","enfermedades":[],"items":[]},{"id":5,"nombre":"Comet","tipo":"Caballo","superpoder":"Supervelocidad","felicidad":100,"vida":100,"personalidad":"normal","enfermedades":[],"items":[]},{"id":6,"nombre":"Redwing","tipo":"Halcón","superpoder":"Vínculo telepático","felicidad":100,"vida":100,"personalidad":"normal","enfermedades":[],"items":[]},{"id":7,"nombre":"Jumpa","tipo":"Canguro","superpoder":"Fuerza aumentada","felicidad":100,"vida":100,"personalidad":"normal","enfermedades":[],"items":[]},{"id":8,"nombre":"Streaky","tipo":"Gato","superpoder":"Superfuerza","felicidad":100,"vida":100,"personalidad":"normal","enfermedades":[],"items":[]},{"id":9,"nombre":"Bat-Cow","tipo":"Vaca","superpoder":"Resistencia","felicidad":100,"vida":100,"personalidad":"normal","enfermedades":[],"items":[]},{"id":10,"nombre":"Ch'p","tipo":"Ardilla","superpoder":"Anillo de poder","felicidad":100,"vida":100,"personalidad":"normal","enfermedades":[],"items":[]}]

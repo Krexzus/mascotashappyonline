@@ -1,12 +1,14 @@
-class Hero {
-    constructor(id, name, alias, city, team, petId = null) {
-        this.id = id
-        this.name = name
-        this.alias = alias
-        this.city = city
-        this.team = team
-        this.petId = petId // id de la mascota asignada
-    }
-}
+import mongoose from 'mongoose';
 
-export default Hero 
+const heroSchema = new mongoose.Schema({
+  id: { type: Number, required: true, unique: true },
+  name: { type: String, required: true },
+  alias: { type: String, required: true },
+  city: { type: String, required: true },
+  team: { type: String, required: true },
+  petId: { type: Number, default: null }
+});
+
+const Hero = mongoose.model('Hero', heroSchema, 'superheroes');
+
+export default Hero; 

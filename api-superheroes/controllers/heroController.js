@@ -1,7 +1,6 @@
 import express from "express";
 import { check, validationResult } from 'express-validator';
-import heroService from "../services/heroService.js";
-import Hero from "../models/heroModel.js";
+import * as heroService from "../services/heroService.js";
 
 const router = express.Router();
 
@@ -14,82 +13,58 @@ router.get("/heroes", async (req, res) => {
     }
 });
 
-router.post("/heroes",
-    [
-        check('name').not().isEmpty().withMessage('El nombre es requerido'),
-        check('alias').not().isEmpty().withMessage('El alias es requerido')
-    ], 
-    async (req, res) => {
-        const errors = validationResult(req)
-        if(!errors.isEmpty()){
-            return res.status(400).json({ error : errors.array() })
-        }
-        try {
-            const { name, alias, city, team } = req.body;
-            const newHero = new Hero(null, name, alias, city, team);
-            const addedHero = await heroService.addHero(newHero);
-            res.status(201).json(addedHero);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
+router.post("/heroes", async (req, res) => {
+    try {
+        const hero = await heroService.addHero(req.body);
+        res.status(201).json(hero);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 router.put("/heroes/:id", async (req, res) => {
     try {
-        const updatedHero = await heroService.updateHero(req.params.id, req.body);
-        res.json(updatedHero);
+        const hero = await heroService.updateHero(req.params.id, req.body);
+        res.json(hero);
     } catch (error) {
-        res.status(404).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
 });
 
-router.delete('/heroes/:id', async (req, res) => {
+router.delete("/heroes/:id", async (req, res) => {
     try {
-        const result = await heroService.deleteHero(req.params.id);
-        res.json(result);
+        await heroService.deleteHero(req.params.id);
+        res.json({ message: "Héroe eliminado" });
     } catch (error) {
-        res.status(404).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
 });
 
-router.get('/heroes/city/:city', async (req, res) => {
-  try {
-    const heroes = await heroService.findHeroesByCity(req.params.city);
-    res.json(heroes);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+router.get("/heroes/city/:city", async (req, res) => {
+    try {
+        const heroes = await heroService.findHeroesByCity(req.params.city);
+        res.json(heroes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
-router.post('/heroes/:id/enfrentar', async (req, res) => {
-  try {
-    const result = await heroService.faceVillain(req.params.id, req.body.villain);
-    res.json({ message: result });
-  } catch (err) {
-    res.status(404).json({ error: err.message });
-  }
+router.post("/heroes/:heroId/adopt/:petId", async (req, res) => {
+    try {
+        const hero = await heroService.adoptPet(req.params.heroId, req.params.petId);
+        res.json(hero);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
-router.post('/heroes/:heroId/adoptar', async (req, res) => {
-  const { petId } = req.body;
-  if (!petId) {
-    return res.status(400).json({ error: 'Debes enviar el id de la mascota (petId) en el body.' });
-  }
-  try {
-    const result = await heroService.adoptPet(req.params.heroId, petId);
-    res.json(result);
-  } catch (err) {
-    res.status(404).json({ error: err.message });
-  }
+router.post("/heroes/:heroId/face-villain", async (req, res) => {
+    try {
+        const result = await heroService.faceVillain(req.params.heroId, req.body.villain);
+        res.json({ result });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
-router.post('/heroes/:heroId/adoptar-aleatorio', async (req, res) => {
-  try {
-    const result = await heroService.adoptRandomPet(req.params.heroId);
-    res.json(result);
-  } catch (err) {
-    res.status(404).json({ error: err.message });
-  }
-});
-
-export default router 
+export default router; 

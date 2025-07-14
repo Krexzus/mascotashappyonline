@@ -1,28 +1,29 @@
-import fs from 'fs-extra'
-import Hero from '../models/heroModel.js'
+import Hero from '../models/heroModel.js';
 
-const filePath = './superheroes.json'
-
-async function getHeroes() {
-    try {
-        const data = await fs.readJson(filePath)
-        return data.map(hero => new Hero(
-            hero.id, hero.name, hero.alias, hero.city, hero.team, hero.petId || null
-        ))
-    } catch (error) {
-        console.error(error)
-    }
+export async function getHeroes() {
+  return await Hero.find({}).lean();
 }
 
-async function saveHeroes(heroes) {
-    try {
-        await fs.writeJson(filePath, heroes)
-    } catch (error) {
-        console.error(error)
-    }
+export async function saveHeroes(heroes) {
+  // Este método ya no es necesario, pero lo dejamos para compatibilidad
+  // Puedes actualizar o eliminar según tu lógica de negocio
+  return;
 }
 
-export default {
-    getHeroes,
-    saveHeroes
+export async function addHero(heroData) {
+  const hero = new Hero(heroData);
+  await hero.save();
+  return hero;
+}
+
+export async function updateHero(id, updatedHero) {
+  return await Hero.findOneAndUpdate({ id: Number(id) }, updatedHero, { new: true });
+}
+
+export async function deleteHero(id) {
+  return await Hero.findOneAndDelete({ id: Number(id) });
+}
+
+export async function findHeroesByCity(city) {
+  return await Hero.find({ city }).lean();
 } 
