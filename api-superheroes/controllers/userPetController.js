@@ -7,14 +7,39 @@ const router = express.Router();
 // Middleware de autenticación para todas las rutas
 router.use(authMiddleware);
 
+// Función helper para buscar mascota por userId (maneja tipos number y string)
+async function findPetByUserId(userId) {
+    console.log('🔍 HELPER - Buscando mascota para userId:', userId, 'tipo:', typeof userId);
+    
+    // Intentar buscar como está
+    let pet = await Pet.findOne({ userId: userId });
+    
+    // Si no encuentra y es número, intentar como string
+    if (!pet && typeof userId === 'number') {
+        console.log('🔍 HELPER - Intentando buscar como string:', userId.toString());
+        pet = await Pet.findOne({ userId: userId.toString() });
+    }
+    
+    // Si no encuentra y es string, intentar como número
+    if (!pet && typeof userId === 'string') {
+        const numericUserId = parseInt(userId);
+        if (!isNaN(numericUserId)) {
+            console.log('🔍 HELPER - Intentando buscar como número:', numericUserId);
+            pet = await Pet.findOne({ userId: numericUserId });
+        }
+    }
+    
+    console.log('🔍 HELPER - Mascota encontrada:', pet ? 'SÍ' : 'NO');
+    return pet;
+}
+
 // GET /api/pets/my-pet - Obtener la mascota del usuario autenticado
 router.get("/pets/my-pet", async (req, res) => {
     try {
         const userId = req.user.id;
         console.log('🔍 DEBUG GET - Buscando mascota para userId:', userId, 'tipo:', typeof userId);
         
-        const pet = await Pet.findOne({ userId: userId });
-        console.log('🔍 DEBUG GET - Mascota encontrada:', pet ? 'SÍ' : 'NO');
+        const pet = await findPetByUserId(userId);
         
         if (!pet) {
             // Debugging para ver todas las mascotas
@@ -57,7 +82,7 @@ router.post("/pets/my-pet", async (req, res) => {
         const { nombre, tipo, superpoder } = req.body;
 
         // Verificar si el usuario ya tiene una mascota
-        const existingPet = await Pet.findOne({ userId: userId });
+        const existingPet = await findPetByUserId(userId);
         if (existingPet) {
             return res.status(409).json({
                 success: false,
@@ -113,9 +138,8 @@ router.post("/pets/my-pet/feed", async (req, res) => {
         console.log('🔍 DEBUG - Buscando mascota para userId:', userId);
         console.log('🔍 DEBUG - Tipo de userId:', typeof userId);
         
-        // Buscar mascota con debugging
-        const pet = await Pet.findOne({ userId: userId });
-        console.log('🔍 DEBUG - Mascota encontrada:', pet ? 'SÍ' : 'NO');
+        // Buscar mascota con función helper
+        const pet = await findPetByUserId(userId);
         
         if (!pet) {
             // Buscar todas las mascotas para debugging
@@ -180,7 +204,7 @@ router.post("/pets/my-pet/water", async (req, res) => {
         const userId = req.user.id;
         console.log('🔍 DEBUG WATER - Buscando mascota para userId:', userId, 'tipo:', typeof userId);
         
-        const pet = await Pet.findOne({ userId: userId });
+        const pet = await findPetByUserId(userId);
         
         if (!pet) {
             // Debugging adicional
@@ -231,7 +255,7 @@ router.post("/pets/my-pet/water", async (req, res) => {
 router.post("/pets/my-pet/exercise", async (req, res) => {
     try {
         const userId = req.user.id;
-        const pet = await Pet.findOne({ userId: userId });
+        const pet = await findPetByUserId(userId);
         
         if (!pet) {
             return res.status(404).json({
@@ -276,7 +300,7 @@ router.post("/pets/my-pet/exercise", async (req, res) => {
 router.get("/pets/my-pet/status", async (req, res) => {
     try {
         const userId = req.user.id;
-        const pet = await Pet.findOne({ userId: userId });
+        const pet = await findPetByUserId(userId);
         
         if (!pet) {
             return res.status(404).json({

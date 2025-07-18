@@ -52,7 +52,7 @@ setTimeout(() => {
 }, 2000);
 
 app.use("/api", heroController);
-app.use("/api", petController);
+// app.use("/api", petController); // DESHABILITADO - Usar userPetController en su lugar
 app.use("/api", authController);
 app.use("/api", userPetController);
 
