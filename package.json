@@ -1,4 +1,18 @@
 {
+  "name": "pou-pets-api",
+  "version": "3.0.0",
+  "description": "🎮 API de mascotas privadas tipo Pou - Cada usuario tiene su propia mascota virtual",
+  "main": "api-superheroes/app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node start.js",
+    "dev": "cd api-superheroes && npm run dev",
+    "build": "cd api-superheroes && npm install",
+    "postinstall": "cd api-superheroes && npm install"
+  },
+  "keywords": ["pou", "pets", "virtual-pet", "api", "mongodb", "jwt", "express"],
+  "author": "Tu Nombre",
+  "license": "MIT",
   "dependencies": {
     "dotenv": "^17.2.0",
     "mongoose": "^8.16.3"
