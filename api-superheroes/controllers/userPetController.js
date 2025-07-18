@@ -350,8 +350,7 @@ router.get("/pets/my-pet/status", async (req, res) => {
     }
 });
 
-export default router;// 
-POST /api/pets/my-pet/customize - Agregar item a la mascota
+// POST /api/pets/my-pet/customize - Agregar item a la mascota
 router.post("/pets/my-pet/customize", async (req, res) => {
     try {
         const userId = req.user.id;
@@ -638,3 +637,5 @@ function generarDescripcionApariencia(pet, itemsEquipados) {
     
     return descripcion;
 }
+
+export default router;
