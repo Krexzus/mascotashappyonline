@@ -1,6 +1,7 @@
 {
-  "name": "api-superheroes",
-  "version": "1.0.0",
+  "name": "pou-pets-api",
+  "version": "3.0.0",
+  "description": "API de mascotas privadas tipo Pou - Cada usuario tiene su propia mascota virtual",
   "main": "app.js",
   "type": "module",
   "scripts": {
@@ -8,15 +9,17 @@
     "start": "node app.js",
     "dev": "node --watch app.js"
   },
-  "keywords": [],
-  "author": "javerage",
-  "license": "ISC",
-  "description": "",
+  "keywords": ["pou", "pets", "virtual-pet", "api", "mongodb", "jwt", "express"],
+  "author": "Tu Nombre",
+  "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "fs-extra": "^11.3.0",
-    "mongodb": "^6.17.0"
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.17.0",
+    "mongoose": "^8.0.0"
   }
 }

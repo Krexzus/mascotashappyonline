@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const petSchema = new mongoose.Schema({
   id: { type: Number, required: true, unique: true },
+  userId: { type: Number, required: true }, // NUEVO CAMPO para privacidad
   nombre: { type: String, required: true },
   tipo: { type: String, required: true },
   superpoder: { type: String, required: true },

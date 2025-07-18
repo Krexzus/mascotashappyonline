@@ -53,6 +53,55 @@ export async function addPet(newPet) {
     }
 }
 
+// Nueva función para agregar mascota a un usuario específico
+export async function addPetForUser(userId, petData) {
+    try {
+        const pets = await petRepository.getPets();
+        const newPet = {
+            ...petData,
+            userId: userId,
+            id: pets.length > 0 ? Math.max(...pets.map(p => p.id)) + 1 : 1
+        };
+        
+        // Inicializar propiedades del sistema Pou
+        inicializarPropiedadesPou(newPet);
+        
+        pets.push(newPet);
+        await petRepository.savePets(pets);
+        return newPet;
+    } catch (error) {
+        console.error('Error al agregar mascota para usuario:', error);
+        throw new Error('Error al agregar la mascota');
+    }
+}
+
+// Nueva función para obtener mascotas de un usuario específico
+export async function getPetsByUserId(userId) {
+    try {
+        const pets = await petRepository.getPets();
+        const userPets = pets.filter(pet => pet.userId === userId);
+        return userPets.map(pet => inicializarPropiedadesPou(pet));
+    } catch (error) {
+        console.error('Error al obtener mascotas del usuario:', error);
+        throw new Error('Error al obtener las mascotas del usuario');
+    }
+}
+
+// Nueva función para obtener la mascota principal de un usuario
+export async function getUserMainPet(userId) {
+    try {
+        const userPets = await getPetsByUserId(userId);
+        if (userPets.length === 0) {
+            throw new Error('El usuario no tiene mascotas');
+        }
+        // Retornar la primera mascota (mascota principal)
+        return userPets[0];
+    } catch (error) {
+        console.error('Error al obtener mascota principal:', error);
+        throw error;
+    }
+}
+
 export async function updatePet(id, updates) {
     try {
         id = parseInt(id);
@@ -743,3 +792,193 @@ export default {
     getPetWeightInfo,
     forzarAumentoPeso
 }; 
+
+// MÉTODOS ESPECÍFICOS PARA USUARIOS
+
+// Obtener mascota de un usuario específico
+export async function obtenerMascotaPorUsuario(userId) {
+    try {
+        const pets = await petRepository.getPets();
+        const userPet = pets.find(pet => pet.userId === userId);
+        
+        if (!userPet) {
+            return null;
+        }
+        
+        // Inicializar propiedades y aplicar degradación temporal
+        inicializarPropiedadesPou(userPet);
+        await degradarEstadisticasTiempo(userPet.id);
+        
+        return userPet;
+    } catch (error) {
+        console.error('Error al obtener mascota del usuario:', error);
+        throw error;
+    }
+}
+
+// Crear mascota para un usuario específico
+export async function crearMascotaParaUsuario(userId, petData) {
+    try {
+        // Verificar si el usuario ya tiene una mascota
+        const existingPet = await obtenerMascotaPorUsuario(userId);
+        if (existingPet) {
+            throw new Error('El usuario ya tiene una mascota');
+        }
+        
+        const pets = await petRepository.getPets();
+        const newPet = {
+            ...petData,
+            userId: userId,
+            id: pets.length > 0 ? Math.max(...pets.map(p => p.id)) + 1 : 1
+        };
+        
+        // Inicializar propiedades del sistema Pou
+        inicializarPropiedadesPou(newPet);
+        
+        pets.push(newPet);
+        await petRepository.savePets(pets);
+        
+        return newPet;
+    } catch (error) {
+        console.error('Error al crear mascota para usuario:', error);
+        throw error;
+    }
+}
+
+// Actualizar mascota de un usuario específico
+export async function actualizarMascotaUsuario(userId, updates) {
+    try {
+        const pets = await petRepository.getPets();
+        const petIndex = pets.findIndex(pet => pet.userId === userId);
+        
+        if (petIndex === -1) {
+            return null;
+        }
+        
+        // Aplicar actualizaciones
+        Object.assign(pets[petIndex], updates);
+        
+        // Inicializar propiedades faltantes
+        inicializarPropiedadesPou(pets[petIndex]);
+        
+        await petRepository.savePets(pets);
+        return pets[petIndex];
+    } catch (error) {
+        console.error('Error al actualizar mascota del usuario:', error);
+        throw error;
+    }
+}
+
+// Alimentar mascota de un usuario específico
+export async function alimentarMascotaUsuario(userId) {
+    try {
+        const pets = await petRepository.getPets();
+        const pet = pets.find(pet => pet.userId === userId);
+        
+        if (!pet) {
+            return null;
+        }
+        
+        // Usar la lógica existente de alimentar
+        return await alimentarPet(pet.id);
+    } catch (error) {
+        console.error('Error al alimentar mascota del usuario:', error);
+        throw error;
+    }
+}
+
+// Dar agua a mascota de un usuario específico
+export async function darAguaMascotaUsuario(userId) {
+    try {
+        const pets = await petRepository.getPets();
+        const pet = pets.find(pet => pet.userId === userId);
+        
+        if (!pet) {
+            return null;
+        }
+        
+        return await darAguaPet(pet.id);
+    } catch (error) {
+        console.error('Error al dar agua a mascota del usuario:', error);
+        throw error;
+    }
+}
+
+// Ejercitar mascota de un usuario específico
+export async function ejercitarMascotaUsuario(userId) {
+    try {
+        const pets = await petRepository.getPets();
+        const pet = pets.find(pet => pet.userId === userId);
+        
+        if (!pet) {
+            return null;
+        }
+        
+        return await hacerEjercicioPet(pet.id);
+    } catch (error) {
+        console.error('Error al ejercitar mascota del usuario:', error);
+        throw error;
+    }
+}
+
+// Obtener estado de mascota de un usuario específico
+export async function obtenerEstadoMascotaUsuario(userId) {
+    try {
+        const pets = await petRepository.getPets();
+        const pet = pets.find(pet => pet.userId === userId);
+        
+        if (!pet) {
+            return null;
+        }
+        
+        return await getPetStatus(pet.id);
+    } catch (error) {
+        console.error('Error al obtener estado de mascota del usuario:', error);
+        throw error;
+    }
+}
+
+// Curar mascota de un usuario específico
+export async function curarMascotaUsuario(userId) {
+    try {
+        const pets = await petRepository.getPets();
+        const pet = pets.find(pet => pet.userId === userId);
+        
+        if (!pet || !pet.enfermedades || pet.enfermedades.length === 0) {
+            return null;
+        }
+        
+        // Curar todas las enfermedades
+        pet.enfermedades = [];
+        pet.vida = Math.min(100, pet.vida + 20);
+        pet.felicidad = Math.min(100, pet.felicidad + 15);
+        
+        // Recalcular personalidad
+        recalcularPersonalidad(pet);
+        
+        await petRepository.updatePet(pet.id, pet);
+        return pet;
+    } catch (error) {
+        console.error('Error al curar mascota del usuario:', error);
+        throw error;
+    }
+}
+
+// Crear mascota automática para nuevo usuario
+export async function crearMascotaAutomatica(userId) {
+    try {
+        const mascotasDefault = [
+            { nombre: 'Buddy', tipo: 'perro', superpoder: 'lealtad' },
+            { nombre: 'Whiskers', tipo: 'gato', superpoder: 'agilidad' },
+            { nombre: 'Goldie', tipo: 'pez', superpoder: 'tranquilidad' },
+            { nombre: 'Tweety', tipo: 'pájaro', superpoder: 'velocidad' }
+        ];
+        
+        const mascotaAleatoria = mascotasDefault[Math.floor(Math.random() * mascotasDefault.length)];
+        
+        return await crearMascotaParaUsuario(userId, mascotaAleatoria);
+    } catch (error) {
+        console.error('Error al crear mascota automática:', error);
+        throw error;
+    }
+}
