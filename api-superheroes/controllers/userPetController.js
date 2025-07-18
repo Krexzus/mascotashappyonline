@@ -11,13 +11,27 @@ router.use(authMiddleware);
 router.get("/pets/my-pet", async (req, res) => {
     try {
         const userId = req.user.id;
+        console.log('🔍 DEBUG GET - Buscando mascota para userId:', userId, 'tipo:', typeof userId);
+        
         const pet = await Pet.findOne({ userId: userId });
+        console.log('🔍 DEBUG GET - Mascota encontrada:', pet ? 'SÍ' : 'NO');
         
         if (!pet) {
+            // Debugging para ver todas las mascotas
+            const allPets = await Pet.find({});
+            console.log('🔍 DEBUG GET - Total mascotas:', allPets.length);
+            console.log('🔍 DEBUG GET - UserIds en DB:', allPets.map(p => ({ id: p.userId, tipo: typeof p.userId })));
+            
             return res.status(404).json({
                 success: false,
                 message: "No tienes una mascota. Puedes crear una nueva.",
-                instructions: "Usa POST /api/pets/my-pet para crear tu mascota"
+                instructions: "Usa POST /api/pets/my-pet para crear tu mascota",
+                debug: {
+                    buscandoUserId: userId,
+                    tipoUserId: typeof userId,
+                    totalMascotas: allPets.length,
+                    userIdsEnDB: allPets.map(p => p.userId)
+                }
             });
         }
 
@@ -96,12 +110,28 @@ router.post("/pets/my-pet", async (req, res) => {
 router.post("/pets/my-pet/feed", async (req, res) => {
     try {
         const userId = req.user.id;
+        console.log('🔍 DEBUG - Buscando mascota para userId:', userId);
+        console.log('🔍 DEBUG - Tipo de userId:', typeof userId);
+        
+        // Buscar mascota con debugging
         const pet = await Pet.findOne({ userId: userId });
+        console.log('🔍 DEBUG - Mascota encontrada:', pet ? 'SÍ' : 'NO');
         
         if (!pet) {
+            // Buscar todas las mascotas para debugging
+            const allPets = await Pet.find({});
+            console.log('🔍 DEBUG - Total mascotas en DB:', allPets.length);
+            console.log('🔍 DEBUG - UserIds en DB:', allPets.map(p => ({ id: p.userId, tipo: typeof p.userId })));
+            
             return res.status(404).json({
                 success: false,
-                message: "No se encontró tu mascota"
+                message: "No se encontró tu mascota",
+                debug: {
+                    buscandoUserId: userId,
+                    tipoUserId: typeof userId,
+                    totalMascotas: allPets.length,
+                    userIdsEnDB: allPets.map(p => p.userId)
+                }
             });
         }
 
@@ -148,12 +178,23 @@ router.post("/pets/my-pet/feed", async (req, res) => {
 router.post("/pets/my-pet/water", async (req, res) => {
     try {
         const userId = req.user.id;
+        console.log('🔍 DEBUG WATER - Buscando mascota para userId:', userId, 'tipo:', typeof userId);
+        
         const pet = await Pet.findOne({ userId: userId });
         
         if (!pet) {
+            // Debugging adicional
+            const allPets = await Pet.find({});
+            console.log('🔍 DEBUG WATER - UserIds en DB:', allPets.map(p => ({ id: p.userId, tipo: typeof p.userId })));
+            
             return res.status(404).json({
                 success: false,
-                message: "No se encontró tu mascota"
+                message: "No se encontró tu mascota",
+                debug: {
+                    buscandoUserId: userId,
+                    tipoUserId: typeof userId,
+                    userIdsEnDB: allPets.map(p => p.userId)
+                }
             });
         }
 
