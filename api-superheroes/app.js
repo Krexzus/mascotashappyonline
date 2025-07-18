@@ -19,6 +19,7 @@ mongoose.connect(MONGODB_URI)
 .catch(err => {
     console.error('❌ Error al conectar a MongoDB Atlas:', err);
     console.error('💡 Verifica tu conexión a internet y las credenciales de MongoDB');
+    console.error('⚠️ La aplicación continuará funcionando pero sin base de datos');
 });
 
 const app = express();
@@ -27,19 +28,27 @@ const PORT = process.env.PORT || 10000;
 app.use(cors());
 app.use(express.json());
 
-// Inicializar sistema Pou al arrancar
+// Inicializar sistema Pou al arrancar (de forma segura)
 async function inicializarSistemaPou() {
     try {
         console.log('🔄 Inicializando sistema Pou...');
-        await petService.migrarMascotasExistentes();
-        console.log('✅ Sistema Pou inicializado correctamente');
+        // Solo inicializar si MongoDB está conectado
+        if (mongoose.connection.readyState === 1) {
+            await petService.migrarMascotasExistentes();
+            console.log('✅ Sistema Pou inicializado correctamente');
+        } else {
+            console.log('⏳ Esperando conexión a MongoDB para inicializar Pou...');
+        }
     } catch (error) {
         console.error('❌ Error al inicializar sistema Pou:', error);
+        console.log('⚠️ La aplicación continuará funcionando sin la inicialización Pou');
     }
 }
 
-// Inicializar al arrancar
-inicializarSistemaPou();
+// Inicializar después de un pequeño delay para dar tiempo a MongoDB
+setTimeout(() => {
+    inicializarSistemaPou();
+}, 2000);
 
 app.use("/api", heroController);
 app.use("/api", petController);
