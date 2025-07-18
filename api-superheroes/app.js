@@ -17,9 +17,10 @@ mongoose.connect(MONGODB_URI)
     console.log('🎮 Sistema de mascotas privadas tipo Pou listo');
 })
 .catch(err => {
-    console.error('❌ Error al conectar a MongoDB Atlas:', err);
+    console.error('❌ Error al conectar a MongoDB Atlas:', err.message);
     console.error('💡 Verifica tu conexión a internet y las credenciales de MongoDB');
     console.error('⚠️ La aplicación continuará funcionando pero sin base de datos');
+    // No terminar el proceso, continuar sin MongoDB
 });
 
 const app = express();
@@ -89,8 +90,38 @@ app.get("/", (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
+// Manejo de errores no capturados
+process.on('uncaughtException', (error) => {
+    console.error('❌ Error no capturado:', error);
+    console.log('⚠️ La aplicación continuará funcionando...');
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Promesa rechazada no manejada:', reason);
+    console.log('⚠️ La aplicación continuará funcionando...');
+});
+
+// Iniciar servidor
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
     console.log(`🎮 Sistema Pou activo - Las mascotas necesitan cuidado constante!`);
+    console.log(`🌐 Servidor listo para recibir conexiones`);
+});
+
+// Manejo de cierre graceful
+process.on('SIGTERM', () => {
+    console.log('🔄 Cerrando servidor gracefully...');
+    server.close(() => {
+        console.log('✅ Servidor cerrado correctamente');
+        mongoose.connection.close();
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('🔄 Cerrando servidor gracefully...');
+    server.close(() => {
+        console.log('✅ Servidor cerrado correctamente');
+        mongoose.connection.close();
+    });
 });
 
