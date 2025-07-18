@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'tu-clave-secreta-super-segura-2024';
+const JWT_SECRET = process.env.JWT_SECRET || 'pou-pets-jwt-secret-key-2024-render-production';
 const JWT_EXPIRES_IN = '24h';
 
 class AuthService {
@@ -101,8 +101,17 @@ class AuthService {
   // Verificar token
   verifyToken(token) {
     try {
-      return jwt.verify(token, JWT_SECRET);
+      console.log('🔍 DEBUG TOKEN - Verificando token...');
+      console.log('🔍 DEBUG TOKEN - JWT_SECRET existe:', !!JWT_SECRET);
+      console.log('🔍 DEBUG TOKEN - Token recibido:', token ? 'SÍ' : 'NO');
+      console.log('🔍 DEBUG TOKEN - Longitud del token:', token ? token.length : 0);
+      
+      const decoded = jwt.verify(token, JWT_SECRET);
+      console.log('🔍 DEBUG TOKEN - Token decodificado exitosamente:', decoded);
+      return decoded;
     } catch (error) {
+      console.error('❌ DEBUG TOKEN - Error al verificar token:', error.message);
+      console.error('❌ DEBUG TOKEN - Tipo de error:', error.name);
       throw new Error('Token inválido');
     }
   }

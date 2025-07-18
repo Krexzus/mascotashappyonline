@@ -350,4 +350,291 @@ router.get("/pets/my-pet/status", async (req, res) => {
     }
 });
 
-export default router;
+export default router;// 
+POST /api/pets/my-pet/customize - Agregar item a la mascota
+router.post("/pets/my-pet/customize", async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { item } = req.body;
+
+        // Validar que se envíe un item
+        if (!item || !item.nombre || !item.tipo) {
+            return res.status(400).json({
+                success: false,
+                message: "Debes enviar un item válido con nombre y tipo",
+                ejemplo: {
+                    item: {
+                        nombre: "Sombrero Rojo",
+                        tipo: "sombrero",
+                        color: "#FF0000",
+                        descripcion: "Un elegante sombrero rojo"
+                    }
+                }
+            });
+        }
+
+        const pet = await findPetByUserId(userId);
+        
+        if (!pet) {
+            return res.status(404).json({
+                success: false,
+                message: "No se encontró tu mascota"
+            });
+        }
+
+        // Agregar el item a la mascota
+        const nuevoItem = {
+            id: pet.items.length + 1,
+            nombre: item.nombre,
+            tipo: item.tipo,
+            color: item.color || "#000000",
+            descripcion: item.descripcion || "",
+            fechaObtenido: new Date().toISOString(),
+            equipado: item.equipado || false
+        };
+
+        pet.items.push(nuevoItem);
+        
+        // Aumentar felicidad por personalización
+        pet.felicidad = Math.min(100, pet.felicidad + 8);
+        pet.ultimaActualizacion = new Date().toISOString();
+
+        await pet.save();
+
+        res.json({
+            success: true,
+            message: `¡${item.nombre} agregado a tu mascota! 🎨`,
+            data: {
+                mascota: pet,
+                nuevoItem: nuevoItem,
+                totalItems: pet.items.length
+            },
+            stats: {
+                felicidad: pet.felicidad,
+                totalItems: pet.items.length
+            }
+        });
+    } catch (error) {
+        console.error("Error al personalizar mascota:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error interno del servidor",
+            error: error.message
+        });
+    }
+});
+
+// GET /api/pets/my-pet/items - Ver todos los items de la mascota
+router.get("/pets/my-pet/items", async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const pet = await findPetByUserId(userId);
+        
+        if (!pet) {
+            return res.status(404).json({
+                success: false,
+                message: "No se encontró tu mascota"
+            });
+        }
+
+        // Categorizar items por tipo
+        const itemsPorTipo = pet.items.reduce((acc, item) => {
+            if (!acc[item.tipo]) {
+                acc[item.tipo] = [];
+            }
+            acc[item.tipo].push(item);
+            return acc;
+        }, {});
+
+        res.json({
+            success: true,
+            message: "Items de tu mascota",
+            data: {
+                totalItems: pet.items.length,
+                items: pet.items,
+                itemsPorTipo: itemsPorTipo,
+                tiposDisponibles: Object.keys(itemsPorTipo)
+            }
+        });
+    } catch (error) {
+        console.error("Error al obtener items:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error interno del servidor",
+            error: error.message
+        });
+    }
+});
+
+// PUT /api/pets/my-pet/items/:itemId/equip - Equipar/desequipar item
+router.put("/pets/my-pet/items/:itemId/equip", async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const itemId = parseInt(req.params.itemId);
+        const { equipado } = req.body;
+
+        const pet = await findPetByUserId(userId);
+        
+        if (!pet) {
+            return res.status(404).json({
+                success: false,
+                message: "No se encontró tu mascota"
+            });
+        }
+
+        // Buscar el item
+        const item = pet.items.find(i => i.id === itemId);
+        if (!item) {
+            return res.status(404).json({
+                success: false,
+                message: "Item no encontrado"
+            });
+        }
+
+        // Si se está equipando, desequipar otros items del mismo tipo
+        if (equipado) {
+            pet.items.forEach(i => {
+                if (i.tipo === item.tipo && i.id !== itemId) {
+                    i.equipado = false;
+                }
+            });
+        }
+
+        // Cambiar estado del item
+        item.equipado = equipado;
+        pet.ultimaActualizacion = new Date().toISOString();
+
+        await pet.save();
+
+        res.json({
+            success: true,
+            message: equipado ? `¡${item.nombre} equipado! 👕` : `${item.nombre} desequipado`,
+            data: {
+                item: item,
+                itemsEquipados: pet.items.filter(i => i.equipado)
+            }
+        });
+    } catch (error) {
+        console.error("Error al equipar item:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error interno del servidor",
+            error: error.message
+        });
+    }
+});
+
+// DELETE /api/pets/my-pet/items/:itemId - Eliminar item
+router.delete("/pets/my-pet/items/:itemId", async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const itemId = parseInt(req.params.itemId);
+
+        const pet = await findPetByUserId(userId);
+        
+        if (!pet) {
+            return res.status(404).json({
+                success: false,
+                message: "No se encontró tu mascota"
+            });
+        }
+
+        // Buscar el item
+        const itemIndex = pet.items.findIndex(i => i.id === itemId);
+        if (itemIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                message: "Item no encontrado"
+            });
+        }
+
+        // Eliminar el item
+        const itemEliminado = pet.items.splice(itemIndex, 1)[0];
+        pet.ultimaActualizacion = new Date().toISOString();
+
+        await pet.save();
+
+        res.json({
+            success: true,
+            message: `${itemEliminado.nombre} eliminado de tu mascota`,
+            data: {
+                itemEliminado: itemEliminado,
+                totalItems: pet.items.length
+            }
+        });
+    } catch (error) {
+        console.error("Error al eliminar item:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error interno del servidor",
+            error: error.message
+        });
+    }
+});
+
+// GET /api/pets/my-pet/appearance - Ver apariencia actual de la mascota
+router.get("/pets/my-pet/appearance", async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const pet = await findPetByUserId(userId);
+        
+        if (!pet) {
+            return res.status(404).json({
+                success: false,
+                message: "No se encontró tu mascota"
+            });
+        }
+
+        const itemsEquipados = pet.items.filter(item => item.equipado);
+        
+        // Crear descripción de apariencia
+        const apariencia = {
+            nombre: pet.nombre,
+            tipo: pet.tipo,
+            personalidad: pet.personalidad,
+            itemsEquipados: itemsEquipados,
+            descripcion: generarDescripcionApariencia(pet, itemsEquipados)
+        };
+
+        res.json({
+            success: true,
+            message: "Apariencia actual de tu mascota",
+            data: apariencia
+        });
+    } catch (error) {
+        console.error("Error al obtener apariencia:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error interno del servidor",
+            error: error.message
+        });
+    }
+});
+
+// Función helper para generar descripción de apariencia
+function generarDescripcionApariencia(pet, itemsEquipados) {
+    let descripcion = `${pet.nombre} es un ${pet.tipo} con personalidad ${pet.personalidad}.`;
+    
+    if (itemsEquipados.length === 0) {
+        descripcion += " No lleva ningún accesorio puesto.";
+    } else {
+        descripcion += " Lleva puesto: ";
+        const descripciones = itemsEquipados.map(item => {
+            return `${item.nombre} (${item.tipo})`;
+        });
+        descripcion += descripciones.join(", ") + ".";
+    }
+    
+    // Agregar estado emocional
+    if (pet.felicidad >= 80) {
+        descripcion += " Se ve muy feliz! 😄";
+    } else if (pet.felicidad >= 60) {
+        descripcion += " Se ve contento 😊";
+    } else if (pet.felicidad >= 40) {
+        descripcion += " Se ve normal 😐";
+    } else {
+        descripcion += " Se ve triste 😢";
+    }
+    
+    return descripcion;
+}

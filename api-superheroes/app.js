@@ -84,6 +84,13 @@ app.get("/", (req, res) => {
                 "POST /api/pets/my-pet/water - Dar agua (requiere token)",
                 "POST /api/pets/my-pet/exercise - Ejercitar (requiere token)",
                 "GET /api/pets/my-pet/status - Estado detallado (requiere token)"
+            ],
+            customization: [
+                "POST /api/pets/my-pet/customize - Agregar item (requiere token)",
+                "GET /api/pets/my-pet/items - Ver todos los items (requiere token)",
+                "PUT /api/pets/my-pet/items/:id/equip - Equipar/desequipar (requiere token)",
+                "DELETE /api/pets/my-pet/items/:id - Eliminar item (requiere token)",
+                "GET /api/pets/my-pet/appearance - Ver apariencia (requiere token)"
             ]
         },
         instructions: "1. Regístrate, 2. Inicia sesión, 3. Crea tu mascota, 4. ¡Cuídala como en Pou!"

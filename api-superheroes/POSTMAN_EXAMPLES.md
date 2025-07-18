@@ -293,3 +293,197 @@ Authorization: Bearer TU_TOKEN_AQUI
 - ✅ **Degradación Temporal**: Las mascotas necesitan cuidado constante
 
 ¡Disfruta cuidando tu mascota virtual tipo Pou! 🎮
+--
+-
+
+## 🎨 Sistema de Customización e Items
+
+### 🛍️ Agregar Item a la Mascota
+**POST** `http://localhost:3001/api/pets/my-pet/customize`
+
+**Headers:**
+```
+Authorization: Bearer TU_TOKEN_AQUI
+Content-Type: application/json
+```
+
+**Body (JSON):**
+```json
+{
+  "item": {
+    "nombre": "Sombrero Rojo",
+    "tipo": "sombrero",
+    "color": "#FF0000",
+    "descripcion": "Un elegante sombrero rojo que hace ver muy elegante a tu mascota"
+  }
+}
+```
+
+**Otros ejemplos de items:**
+```json
+{
+  "item": {
+    "nombre": "Gafas de Sol",
+    "tipo": "gafas",
+    "color": "#000000",
+    "descripcion": "Gafas oscuras para lucir genial"
+  }
+}
+```
+
+```json
+{
+  "item": {
+    "nombre": "Collar Dorado",
+    "tipo": "collar",
+    "color": "#FFD700",
+    "descripcion": "Un collar brillante y lujoso"
+  }
+}
+```
+
+```json
+{
+  "item": {
+    "nombre": "Camiseta Azul",
+    "tipo": "ropa",
+    "color": "#0066CC",
+    "descripcion": "Una camiseta cómoda de color azul"
+  }
+}
+```
+
+### 👀 Ver Todos los Items
+**GET** `http://localhost:3001/api/pets/my-pet/items`
+
+**Headers:**
+```
+Authorization: Bearer TU_TOKEN_AQUI
+```
+
+### 👕 Equipar/Desequipar Item
+**PUT** `http://localhost:3001/api/pets/my-pet/items/1/equip`
+
+**Headers:**
+```
+Authorization: Bearer TU_TOKEN_AQUI
+Content-Type: application/json
+```
+
+**Body (JSON) - Para equipar:**
+```json
+{
+  "equipado": true
+}
+```
+
+**Body (JSON) - Para desequipar:**
+```json
+{
+  "equipado": false
+}
+```
+
+### 🗑️ Eliminar Item
+**DELETE** `http://localhost:3001/api/pets/my-pet/items/1`
+
+**Headers:**
+```
+Authorization: Bearer TU_TOKEN_AQUI
+```
+
+### 🎭 Ver Apariencia Actual
+**GET** `http://localhost:3001/api/pets/my-pet/appearance`
+
+**Headers:**
+```
+Authorization: Bearer TU_TOKEN_AQUI
+```
+
+**Respuesta esperada:**
+```json
+{
+  "success": true,
+  "message": "Apariencia actual de tu mascota",
+  "data": {
+    "nombre": "Buddy",
+    "tipo": "perro",
+    "personalidad": "alegre",
+    "itemsEquipados": [
+      {
+        "id": 1,
+        "nombre": "Sombrero Rojo",
+        "tipo": "sombrero",
+        "color": "#FF0000",
+        "equipado": true
+      }
+    ],
+    "descripcion": "Buddy es un perro con personalidad alegre. Lleva puesto: Sombrero Rojo (sombrero). Se ve muy feliz! 😄"
+  }
+}
+```
+
+---
+
+## 🎮 Flujo Completo de Customización
+
+### 1. Crear varios items para tu mascota:
+```bash
+# Sombrero
+POST /api/pets/my-pet/customize
+{ "item": { "nombre": "Sombrero Rojo", "tipo": "sombrero", "color": "#FF0000" } }
+
+# Gafas
+POST /api/pets/my-pet/customize  
+{ "item": { "nombre": "Gafas Cool", "tipo": "gafas", "color": "#000000" } }
+
+# Collar
+POST /api/pets/my-pet/customize
+{ "item": { "nombre": "Collar Dorado", "tipo": "collar", "color": "#FFD700" } }
+```
+
+### 2. Ver todos tus items:
+```bash
+GET /api/pets/my-pet/items
+```
+
+### 3. Equipar items (solo uno por tipo):
+```bash
+# Equipar sombrero
+PUT /api/pets/my-pet/items/1/equip
+{ "equipado": true }
+
+# Equipar gafas  
+PUT /api/pets/my-pet/items/2/equip
+{ "equipado": true }
+```
+
+### 4. Ver cómo se ve tu mascota:
+```bash
+GET /api/pets/my-pet/appearance
+```
+
+### 5. Cambiar de look:
+```bash
+# Desequipar sombrero
+PUT /api/pets/my-pet/items/1/equip
+{ "equipado": false }
+
+# Equipar collar
+PUT /api/pets/my-pet/items/3/equip  
+{ "equipado": true }
+```
+
+---
+
+## 🎨 Tipos de Items Disponibles
+
+- **sombrero**: Sombreros, gorras, boinas
+- **gafas**: Gafas de sol, anteojos, lentes
+- **collar**: Collares, cadenas, medallones  
+- **ropa**: Camisetas, vestidos, chaquetas
+- **zapatos**: Zapatos, botas, sandalias
+- **accesorio**: Pulseras, relojes, moños
+- **juguete**: Pelotas, huesos, ratones de juguete
+
+¡Personaliza tu mascota como en el juego Pou! 🎮
