@@ -10,7 +10,17 @@ const petSchema = new mongoose.Schema({
   vida: { type: Number, default: 100 },
   personalidad: { type: String, default: 'normal' },
   enfermedades: { type: [String], default: [] },
-  items: { type: [{ nombre: String, tipo: String }], default: [] },
+  items: { 
+    type: [{
+      nombre: { type: String, required: true },
+      tipo: { type: String, required: true },
+      color: { type: String, default: "#000000" },
+      descripcion: { type: String, default: "" },
+      fechaObtenido: { type: String, default: () => new Date().toISOString() },
+      equipado: { type: Boolean, default: false }
+    }], 
+    default: [] 
+  },
   hambre: { type: Number, default: 0 },
   sed: { type: Number, default: 0 },
   energia: { type: Number, default: 100 },

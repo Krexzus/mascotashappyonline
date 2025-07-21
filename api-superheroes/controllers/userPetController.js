@@ -529,9 +529,38 @@ router.put("/pets/my-pet/items/:itemId/equip", async (req, res) => {
         item.equipado = equipado;
         pet.ultimaActualizacion = new Date().toISOString();
 
-        // Marcar el array de items como modificado para MongoDB
-        pet.markModified('items');
-        await pet.save();
+        // Estrategia más directa: usar el índice del item en el array
+        const itemIndex = pet.items.findIndex(i => i.id === itemId);
+        
+        const updateResult = await Pet.updateOne(
+            { userId: userId },
+            { 
+                $set: { 
+                    [`items.${itemIndex}.equipado`]: equipado,
+                    ultimaActualizacion: new Date().toISOString()
+                }
+            }
+        );
+        
+        console.log('🔍 DEBUG EQUIP - Índice del item:', itemIndex);
+        console.log('🔍 DEBUG EQUIP - Resultado de actualización:', updateResult);
+        
+        // Verificar que se guardó correctamente
+        console.log('🔍 DEBUG EQUIP - Iniciando verificación...');
+        try {
+            const petVerificacion = await findPetByUserId(userId);
+            console.log('🔍 DEBUG EQUIP - Pet verificación obtenido:', petVerificacion ? 'SÍ' : 'NO');
+            console.log('🔍 DEBUG EQUIP - Items en verificación:', petVerificacion.items.length);
+            
+            const itemVerificacion = petVerificacion.items.find(i => i.id === itemId);
+            console.log('🔍 DEBUG EQUIP - Verificación después de guardar:', {
+                itemEncontrado: itemVerificacion ? 'SÍ' : 'NO',
+                equipado: itemVerificacion ? itemVerificacion.equipado : 'N/A',
+                tipoEquipado: itemVerificacion ? typeof itemVerificacion.equipado : 'N/A'
+            });
+        } catch (verifyError) {
+            console.error('🔍 DEBUG EQUIP - Error en verificación:', verifyError);
+        }
         
         console.log('🔍 DEBUG EQUIP - Item después de equipar:', { 
             id: item.id, 
