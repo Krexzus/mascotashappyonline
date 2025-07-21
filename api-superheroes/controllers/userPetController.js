@@ -381,9 +381,10 @@ router.post("/pets/my-pet/customize", async (req, res) => {
             });
         }
 
-        // Agregar el item a la mascota
+        // Generar ID único para el item
+        const maxId = pet.items.length > 0 ? Math.max(...pet.items.map(i => i.id)) : 0;
         const nuevoItem = {
-            id: pet.items.length + 1,
+            id: maxId + 1,
             nombre: item.nombre,
             tipo: item.tipo,
             color: item.color || "#000000",
@@ -391,6 +392,9 @@ router.post("/pets/my-pet/customize", async (req, res) => {
             fechaObtenido: new Date().toISOString(),
             equipado: item.equipado || false
         };
+        
+        console.log('🔍 DEBUG CUSTOMIZE - Creando item con ID:', nuevoItem.id);
+        console.log('🔍 DEBUG CUSTOMIZE - Items actuales:', pet.items.length);
 
         pet.items.push(nuevoItem);
         
@@ -472,6 +476,9 @@ router.put("/pets/my-pet/items/:itemId/equip", async (req, res) => {
         const itemId = parseInt(req.params.itemId);
         const { equipado } = req.body;
 
+        console.log('🔍 DEBUG EQUIP - UserId:', userId);
+        console.log('🔍 DEBUG EQUIP - ItemId buscado:', itemId, 'tipo:', typeof itemId);
+
         const pet = await findPetByUserId(userId);
         
         if (!pet) {
@@ -481,12 +488,31 @@ router.put("/pets/my-pet/items/:itemId/equip", async (req, res) => {
             });
         }
 
-        // Buscar el item
-        const item = pet.items.find(i => i.id === itemId);
+        console.log('🔍 DEBUG EQUIP - Total items en mascota:', pet.items.length);
+        console.log('🔍 DEBUG EQUIP - IDs de items:', pet.items.map(i => ({ id: i.id, tipo: typeof i.id, nombre: i.nombre })));
+
+        // Buscar el item (maneja tipos number y string)
+        let item = pet.items.find(i => i.id === itemId);
+        if (!item && typeof itemId === 'number') {
+            item = pet.items.find(i => i.id === itemId.toString());
+        }
+        if (!item && typeof itemId === 'string') {
+            const numericItemId = parseInt(itemId);
+            if (!isNaN(numericItemId)) {
+                item = pet.items.find(i => i.id === numericItemId);
+            }
+        }
+        console.log('🔍 DEBUG EQUIP - Item encontrado:', item ? 'SÍ' : 'NO');
+        
         if (!item) {
             return res.status(404).json({
                 success: false,
-                message: "Item no encontrado"
+                message: "Item no encontrado",
+                debug: {
+                    itemIdBuscado: itemId,
+                    tipoItemId: typeof itemId,
+                    itemsDisponibles: pet.items.map(i => ({ id: i.id, nombre: i.nombre, tipo: typeof i.id }))
+                }
             });
         }
 
@@ -529,6 +555,9 @@ router.delete("/pets/my-pet/items/:itemId", async (req, res) => {
         const userId = req.user.id;
         const itemId = parseInt(req.params.itemId);
 
+        console.log('🔍 DEBUG DELETE - UserId:', userId);
+        console.log('🔍 DEBUG DELETE - ItemId buscado:', itemId, 'tipo:', typeof itemId);
+
         const pet = await findPetByUserId(userId);
         
         if (!pet) {
@@ -538,12 +567,31 @@ router.delete("/pets/my-pet/items/:itemId", async (req, res) => {
             });
         }
 
-        // Buscar el item
-        const itemIndex = pet.items.findIndex(i => i.id === itemId);
+        console.log('🔍 DEBUG DELETE - Total items en mascota:', pet.items.length);
+        console.log('🔍 DEBUG DELETE - IDs de items:', pet.items.map(i => ({ id: i.id, tipo: typeof i.id, nombre: i.nombre })));
+
+        // Buscar el item (maneja tipos number y string)
+        let itemIndex = pet.items.findIndex(i => i.id === itemId);
+        if (itemIndex === -1 && typeof itemId === 'number') {
+            itemIndex = pet.items.findIndex(i => i.id === itemId.toString());
+        }
+        if (itemIndex === -1 && typeof itemId === 'string') {
+            const numericItemId = parseInt(itemId);
+            if (!isNaN(numericItemId)) {
+                itemIndex = pet.items.findIndex(i => i.id === numericItemId);
+            }
+        }
+        console.log('🔍 DEBUG DELETE - Item encontrado:', itemIndex !== -1 ? 'SÍ' : 'NO');
+        
         if (itemIndex === -1) {
             return res.status(404).json({
                 success: false,
-                message: "Item no encontrado"
+                message: "Item no encontrado",
+                debug: {
+                    itemIdBuscado: itemId,
+                    tipoItemId: typeof itemId,
+                    itemsDisponibles: pet.items.map(i => ({ id: i.id, nombre: i.nombre, tipo: typeof i.id }))
+                }
             });
         }
 
