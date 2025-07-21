@@ -500,8 +500,8 @@ router.put("/pets/my-pet/items/:itemId/equip", async (req, res) => {
         console.log('🔍 DEBUG EQUIP - Total items en mascota:', pet.items.length);
         console.log('🔍 DEBUG EQUIP - IDs de items:', pet.items.map(i => ({ id: i.id, tipo: typeof i.id, nombre: i.nombre })));
 
-        // Buscar el item usando el ObjectId de MongoDB
-        const item = pet.items.find(i => i._id.toString() === itemId);
+        // Buscar el item usando el campo id que realmente existe
+        const item = pet.items.find(i => i.id === itemId);
         console.log('🔍 DEBUG EQUIP - Item encontrado:', item ? 'SÍ' : 'NO');
         
         if (!item) {
@@ -570,8 +570,8 @@ router.delete("/pets/my-pet/items/:itemId", async (req, res) => {
         console.log('🔍 DEBUG DELETE - Total items en mascota:', pet.items.length);
         console.log('🔍 DEBUG DELETE - IDs de items:', pet.items.map(i => ({ id: i.id, tipo: typeof i.id, nombre: i.nombre })));
 
-        // Buscar el item usando el ObjectId de MongoDB
-        const itemIndex = pet.items.findIndex(i => i._id.toString() === itemId);
+        // Buscar el item usando el campo id que realmente existe
+        const itemIndex = pet.items.findIndex(i => i.id === itemId);
         console.log('🔍 DEBUG DELETE - Item encontrado:', itemIndex !== -1 ? 'SÍ' : 'NO');
         
         if (itemIndex === -1) {
@@ -623,7 +623,24 @@ router.get("/pets/my-pet/appearance", async (req, res) => {
             });
         }
 
-        const itemsEquipados = pet.items.filter(item => item.equipado);
+        console.log('🔍 DEBUG APPEARANCE - Total items:', pet.items.length);
+        console.log('🔍 DEBUG APPEARANCE - Todos los items:', pet.items.map(i => ({ 
+            id: i.id, 
+            nombre: i.nombre, 
+            equipado: i.equipado, 
+            tipoEquipado: typeof i.equipado 
+        })));
+        
+        // Filtro robusto que maneja diferentes tipos de datos
+        const itemsEquipados = pet.items.filter(item => {
+            return item.equipado === true || item.equipado === 'true' || item.equipado === 1;
+        });
+        console.log('🔍 DEBUG APPEARANCE - Items equipados encontrados:', itemsEquipados.length);
+        console.log('🔍 DEBUG APPEARANCE - Items equipados:', itemsEquipados.map(i => ({ 
+            id: i.id, 
+            nombre: i.nombre, 
+            equipado: i.equipado 
+        })));
         
         // Crear descripción de apariencia
         const apariencia = {
