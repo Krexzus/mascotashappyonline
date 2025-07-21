@@ -381,10 +381,8 @@ router.post("/pets/my-pet/customize", async (req, res) => {
             });
         }
 
-        // Generar ID único para el item
-        const maxId = pet.items.length > 0 ? Math.max(...pet.items.map(i => i.id)) : 0;
+        // Crear item sin ID manual - MongoDB asignará uno automáticamente
         const nuevoItem = {
-            id: maxId + 1,
             nombre: item.nombre,
             tipo: item.tipo,
             color: item.color || "#000000",
@@ -484,7 +482,7 @@ router.get("/pets/my-pet/items", async (req, res) => {
 router.put("/pets/my-pet/items/:itemId/equip", async (req, res) => {
     try {
         const userId = req.user.id;
-        const itemId = parseInt(req.params.itemId);
+        const itemId = req.params.itemId; // NO convertir a parseInt, usar el string directamente
         const { equipado } = req.body;
 
         console.log('🔍 DEBUG EQUIP - UserId:', userId);
@@ -502,17 +500,8 @@ router.put("/pets/my-pet/items/:itemId/equip", async (req, res) => {
         console.log('🔍 DEBUG EQUIP - Total items en mascota:', pet.items.length);
         console.log('🔍 DEBUG EQUIP - IDs de items:', pet.items.map(i => ({ id: i.id, tipo: typeof i.id, nombre: i.nombre })));
 
-        // Buscar el item (maneja tipos number y string)
-        let item = pet.items.find(i => i.id === itemId);
-        if (!item && typeof itemId === 'number') {
-            item = pet.items.find(i => i.id === itemId.toString());
-        }
-        if (!item && typeof itemId === 'string') {
-            const numericItemId = parseInt(itemId);
-            if (!isNaN(numericItemId)) {
-                item = pet.items.find(i => i.id === numericItemId);
-            }
-        }
+        // Buscar el item usando el ObjectId de MongoDB
+        const item = pet.items.find(i => i._id.toString() === itemId);
         console.log('🔍 DEBUG EQUIP - Item encontrado:', item ? 'SÍ' : 'NO');
         
         if (!item) {
@@ -564,7 +553,7 @@ router.put("/pets/my-pet/items/:itemId/equip", async (req, res) => {
 router.delete("/pets/my-pet/items/:itemId", async (req, res) => {
     try {
         const userId = req.user.id;
-        const itemId = parseInt(req.params.itemId);
+        const itemId = req.params.itemId; // NO convertir a parseInt, usar el string directamente
 
         console.log('🔍 DEBUG DELETE - UserId:', userId);
         console.log('🔍 DEBUG DELETE - ItemId buscado:', itemId, 'tipo:', typeof itemId);
@@ -581,17 +570,8 @@ router.delete("/pets/my-pet/items/:itemId", async (req, res) => {
         console.log('🔍 DEBUG DELETE - Total items en mascota:', pet.items.length);
         console.log('🔍 DEBUG DELETE - IDs de items:', pet.items.map(i => ({ id: i.id, tipo: typeof i.id, nombre: i.nombre })));
 
-        // Buscar el item (maneja tipos number y string)
-        let itemIndex = pet.items.findIndex(i => i.id === itemId);
-        if (itemIndex === -1 && typeof itemId === 'number') {
-            itemIndex = pet.items.findIndex(i => i.id === itemId.toString());
-        }
-        if (itemIndex === -1 && typeof itemId === 'string') {
-            const numericItemId = parseInt(itemId);
-            if (!isNaN(numericItemId)) {
-                itemIndex = pet.items.findIndex(i => i.id === numericItemId);
-            }
-        }
+        // Buscar el item usando el ObjectId de MongoDB
+        const itemIndex = pet.items.findIndex(i => i._id.toString() === itemId);
         console.log('🔍 DEBUG DELETE - Item encontrado:', itemIndex !== -1 ? 'SÍ' : 'NO');
         
         if (itemIndex === -1) {
