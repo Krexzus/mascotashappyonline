@@ -397,12 +397,23 @@ router.post("/pets/my-pet/customize", async (req, res) => {
         console.log('🔍 DEBUG CUSTOMIZE - Items actuales:', pet.items.length);
 
         pet.items.push(nuevoItem);
+        console.log('🔍 DEBUG CUSTOMIZE - Items después de agregar:', pet.items.length);
+        console.log('🔍 DEBUG CUSTOMIZE - Último item agregado:', pet.items[pet.items.length - 1]);
         
         // Aumentar felicidad por personalización
         pet.felicidad = Math.min(100, pet.felicidad + 8);
         pet.ultimaActualizacion = new Date().toISOString();
 
+        // Marcar el array de items como modificado para MongoDB
+        pet.markModified('items');
         await pet.save();
+        
+        console.log('🔍 DEBUG CUSTOMIZE - Mascota guardada exitosamente');
+        
+        // Verificar que se guardó correctamente
+        const petVerificacion = await findPetByUserId(userId);
+        console.log('🔍 DEBUG CUSTOMIZE - Items después de guardar:', petVerificacion.items.length);
+        console.log('🔍 DEBUG CUSTOMIZE - Items guardados:', petVerificacion.items.map(i => ({ id: i.id, nombre: i.nombre })));
 
         res.json({
             success: true,
