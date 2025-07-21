@@ -529,7 +529,16 @@ router.put("/pets/my-pet/items/:itemId/equip", async (req, res) => {
         item.equipado = equipado;
         pet.ultimaActualizacion = new Date().toISOString();
 
+        // Marcar el array de items como modificado para MongoDB
+        pet.markModified('items');
         await pet.save();
+        
+        console.log('🔍 DEBUG EQUIP - Item después de equipar:', { 
+            id: item.id, 
+            nombre: item.nombre, 
+            equipado: item.equipado,
+            tipoEquipado: typeof item.equipado
+        });
 
         res.json({
             success: true,
