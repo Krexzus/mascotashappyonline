@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Mi Mascota Virtual</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .pet {
+            width: 100px;
+            height: 100px;
+            background: #ff9ff3;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            cursor: pointer;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .pet-face {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .eyes {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .eye {
+            width: 8px;
+            height: 8px;
+            background: black;
+            border-radius: 50%;
+        }
+        
+        .mouth {
+            width: 15px;
+            height: 8px;
+            border: 2px solid black;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            margin: 0 auto;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .status {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐾 Test - Mi Mascota Virtual</h1>
+            <p>Prueba de conexión con la API</p>
+        </div>
+        
+        <div class="pet" onclick="petClick()">
+            <div class="pet-face">
+                <div class="eyes">
+                    <div class="eye"></div>
+                    <div class="eye"></div>
+                </div>
+                <div class="mouth"></div>
+            </div>
+        </div>
+        
+        <div class="status">
+            <p><strong>Estado de la API:</strong> <span id="apiStatus">Verificando...</span></p>
+            <p><strong>Usuario:</strong> <span id="userStatus">No autenticado</span></p>
+        </div>
+        
+        <button onclick="testAPI()">🔍 Probar API</button>
+        <button onclick="testLogin()">🔐 Probar Login</button>
+        <button onclick="clearStorage()">🗑️ Limpiar Datos</button>
+    </div>
+
+    <script>
+        // Configuración de la API - CAMBIA ESTA URL
+        const API_BASE = 'http://localhost:3001';
+        // const API_BASE = 'https://tu-app.onrender.com';
+        
+        let authToken = localStorage.getItem('authToken');
+        
+        // Función para hacer requests a la API
+        async function makeRequest(endpoint, options = {}) {
+            const url = `${API_BASE}${endpoint}`;
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+                }
+            };
+
+            const finalOptions = { ...defaultOptions, ...options };
+
+            try {
+                console.log(`🌐 Request: ${options.method || 'GET'} ${url}`);
+                const response = await fetch(url, finalOptions);
+                const data = await response.json();
+                
+                console.log(`📡 Response:`, { status: response.status, data });
+                
+                return { success: response.ok, data, status: response.status };
+            } catch (error) {
+                console.error(`❌ Error:`, error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        // Probar conexión con la API
+        async function testAPI() {
+            document.getElementById('apiStatus').textContent = 'Probando...';
+            
+            const result = await makeRequest('/');
+            
+            if (result.success) {
+                document.getElementById('apiStatus').textContent = '✅ Conectado';
+                console.log('API Response:', result.data);
+            } else {
+                document.getElementById('apiStatus').textContent = '❌ Error de conexión';
+                console.error('API Error:', result.error);
+            }
+        }
+        
+        // Probar login con usuario de prueba
+        async function testLogin() {
+            const testUser = {
+                username: 'test123',
+                email: 'test@test.com',
+                password: 'test123'
+            };
+            
+            // Primero intentar registrar
+            console.log('🔐 Intentando registrar usuario de prueba...');
+            let result = await makeRequest('/api/auth/register', {
+                method: 'POST',
+                body: JSON.stringify(testUser)
+            });
+            
+            if (!result.success) {
+                // Si falla el registro, intentar login
+                console.log('🔐 Registro falló, intentando login...');
+                result = await makeRequest('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        username: testUser.username,
+                        password: testUser.password
+                    })
+                });
+            }
+            
+            if (result.success) {
+                authToken = result.data.token;
+                localStorage.setItem('authToken', authToken);
+                document.getElementById('userStatus').textContent = `✅ ${result.data.user.username}`;
+                console.log('Login exitoso:', result.data);
+            } else {
+                document.getElementById('userStatus').textContent = '❌ Error de login';
+                console.error('Login error:', result.error);
+            }
+        }
+        
+        // Limpiar datos almacenados
+        function clearStorage() {
+            localStorage.clear();
+            authToken = null;
+            document.getElementById('userStatus').textContent = 'No autenticado';
+            console.log('🗑️ Datos limpiados');
+        }
+        
+        // Interacción con la mascota
+        function petClick() {
+            console.log('🐾 ¡Mascota clickeada!');
+            const pet = document.querySelector('.pet');
+            pet.style.animation = 'none';
+            setTimeout(() => {
+                pet.style.animation = 'float 3s ease-in-out infinite';
+            }, 100);
+        }
+        
+        // Probar API al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Test iniciado');
+            testAPI();
+            
+            // Verificar si hay token guardado
+            if (authToken) {
+                makeRequest('/api/auth/profile').then(result => {
+                    if (result.success) {
+                        document.getElementById('userStatus').textContent = `✅ ${result.data.user.username}`;
+                    } else {
+                        clearStorage();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

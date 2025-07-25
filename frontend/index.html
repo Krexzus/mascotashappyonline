@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐾 Mi Mascota Virtual - Tipo Pou</title>
+    <style>
+        /* Reset y base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        /* Contenedores principales */
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+            min-height: 600px;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            padding: 15px;
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1,
+        .header h2 {
+            margin: 0;
+            flex: 1;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Área de la mascota */
+        .pet-area {
+            height: 300px;
+            background: linear-gradient(to bottom, #87CEEB, #98FB98);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .pet {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #ff9ff3;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .pet:hover {
+            transform: scale(1.1);
+        }
+
+        .pet-face {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .eyes {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .eye {
+            width: 12px;
+            height: 12px;
+            background: black;
+            border-radius: 50%;
+        }
+
+        .mouth {
+            width: 20px;
+            height: 10px;
+            border: 2px solid black;
+            border-top: none;
+            border-radius: 0 0 20px 20px;
+            margin: 0 auto;
+        }
+
+        /* Accesorios de la mascota */
+        .pet-accessories {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .accessory {
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .accessory.sombrero {
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 30px;
+            background: var(--color, #ff0000);
+            border-radius: 50px 50px 10px 10px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .accessory.gafas {
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 20px;
+            background: var(--color, #000000);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .accessory.collar {
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 15px;
+            background: var(--color, #ffd700);
+            border-radius: 10px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+        }
+
+        /* Información de la mascota */
+        .pet-info {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .pet-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .pet-type {
+            font-size: 16px;
+            color: #666;
+            text-transform: capitalize;
+            margin-bottom: 5px;
+        }
+
+        .pet-personality {
+            font-size: 14px;
+            color: #888;
+            font-style: italic;
+            text-transform: capitalize;
+        }
+
+        /* Estadísticas */
+        .stats-container {
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .stat-bar {
+            margin-bottom: 15px;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .stat-progress {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .stat-fill.felicidad {
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+        }
+
+        .stat-fill.vida {
+            background: linear-gradient(90deg, #ff6b6b, #ff4757);
+        }
+
+        .stat-fill.energia {
+            background: linear-gradient(90deg, #3742fa, #2f3542);
+        }
+
+        .stat-fill.hambre {
+            background: linear-gradient(90deg, #ff9ff3, #f368e0);
+        }
+
+        .stat-fill.sed {
+            background: linear-gradient(90deg, #00d2d3, #01a3a4);
+        }
+
+        .stat-fill.peso {
+            background: linear-gradient(90deg, #a55eea, #8854d0);
+        }
+
+        /* Acciones */
+        .actions {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .action-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .feed-btn {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+        }
+
+        .water-btn {
+            background: linear-gradient(45deg, #00d2d3, #01a3a4);
+            color: white;
+        }
+
+        .exercise-btn {
+            background: linear-gradient(45deg, #3742fa, #2f3542);
+            color: white;
+        }
+
+        .status-btn {
+            background: linear-gradient(45deg, #26de81, #20bf6b);
+            color: white;
+        }
+
+        .customize-btn {
+            background: linear-gradient(45deg, #ff9ff3, #f368e0);
+            color: white;
+        }
+
+        .appearance-btn {
+            background: linear-gradient(45deg, #a55eea, #8854d0);
+            color: white;
+        }
+
+        /* Formularios de autenticación */
+        .auth-form {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .auth-form h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .auth-form input,
+        .auth-form select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .auth-form input:focus,
+        .auth-form select:focus {
+            border-color: #667eea;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .link {
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .link:hover {
+            color: #764ba2;
+        }
+
+        /* Mensajes */
+        .message {
+            padding: 10px;
+            margin: 10px 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Modales */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Formulario de personalización */
+        .customize-form {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .customize-form input,
+        .customize-form select {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .customize-form input:focus,
+        .customize-form select:focus {
+            border-color: #667eea;
+        }
+
+        .customize-form input[type="color"] {
+            height: 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* Lista de items */
+        .items-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 20px;
+        }
+
+        .item-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .item-card.equipped {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+            color: #333;
+        }
+
+        .item-type {
+            font-size: 12px;
+            color: #666;
+            text-transform: capitalize;
+        }
+
+        .item-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-left: 10px;
+            border: 2px solid #ddd;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .item-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .equip-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .unequip-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .item-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Contenido de estado y apariencia */
+        #statusContent,
+        #appearanceContent {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .status-section {
+            margin-bottom: 20px;
+        }
+
+        .status-section h4 {
+            color: #333;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        /* Utilidades */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Animaciones */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+
+            .screen {
+                max-width: 100%;
+                min-height: 100vh;
+            }
+
+            .container {
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .actions {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .pet {
+                width: 100px;
+                height: 100px;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Pantalla de autenticación -->
+    <div id="authScreen" class="screen active">
+        <div class="container">
+            <div class="header">
+                <h1>🐾 Mi Mascota Virtual</h1>
+                <p>Tipo Pou - Cuida tu mascota</p>
+            </div>
+
+            <div id="authMessage" class="message hidden"></div>
+
+            <div id="loginForm" class="auth-form">
+                <h2>Iniciar Sesión</h2>
+                <input type="text" id="loginUsername" placeholder="Usuario" required>
+                <input type="password" id="loginPassword" placeholder="Contraseña" required>
+                <button onclick="login()" class="btn-primary">Entrar</button>
+                <p>¿No tienes cuenta? <span class="link" onclick="toggleAuthMode()">Regístrate aquí</span></p>
+            </div>
+
+            <div id="registerForm" class="auth-form hidden">
+                <h2>Crear Cuenta</h2>
+                <input type="text" id="registerUsername" placeholder="Usuario" required>
+                <input type="email" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Contraseña" required>
+                <button onclick="register()" class="btn-primary">Registrarse</button>
+                <p>¿Ya tienes cuenta? <span class="link" onclick="toggleAuthMode()">Inicia sesión aquí</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de crear mascota -->
+    <div id="createPetScreen" class="screen hidden">
+        <div class="container">
+            <div class="header">
+                <h2>🐾 Crear tu Mascota</h2>
+            </div>
+
+            <div id="createPetMessage" class="message hidden"></div>
+
+            <div class="auth-form">
+                <input type="text" id="petNameInput" placeholder="Nombre de tu mascota" required>
+                <select id="petTypeInput">
+                    <option value="perro">🐕 Perro</option>
+                    <option value="gato">🐱 Gato</option>
+                    <option value="conejo">🐰 Conejo</option>
+                    <option value="hamster">🐹 Hámster</option>
+                    <option value="pez">🐠 Pez</option>
+                </select>
+                <select id="petPowerInput">
+                    <option value="lealtad">💖 Lealtad</option>
+                    <option value="velocidad">⚡ Velocidad</option>
+                    <option value="fuerza">💪 Fuerza</option>
+                    <option value="inteligencia">🧠 Inteligencia</option>
+                    <option value="carisma">✨ Carisma</option>
+                </select>
+                <button onclick="createPet()" class="btn-primary">Crear Mascota</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla principal del juego -->
+    <div id="gameScreen" class="screen hidden">
+        <div class="container">
+            <div class="header">
+                <div id="userInfo">Bienvenido, <span id="username"></span></div>
+                <button onclick="logout()" class="btn-logout">Salir</button>
+            </div>
+
+            <!-- Área de la mascota -->
+            <div class="pet-area">
+                <div id="pet" class="pet" onclick="petClick()">
+                    <div class="pet-face">
+                        <div class="eyes">
+                            <div class="eye"></div>
+                            <div class="eye"></div>
+                        </div>
+                        <div id="petMouth" class="mouth"></div>
+                    </div>
+                    <div id="petAccessories" class="pet-accessories"></div>
+                </div>
+            </div>
+
+            <!-- Información de la mascota -->
+            <div class="pet-info">
+                <div id="petName" class="pet-name">Mi Mascota</div>
+                <div id="petType" class="pet-type">perro</div>
+                <div id="petPersonality" class="pet-personality">normal</div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-container">
+                <div class="stat-bar">
+                    <div class="stat-label">
+                        <span>😊 Felicidad</span>
+                        <span id="felicidadValue">100</span>
+                    </div>
+                    <div class="stat-progress">
+                        <div id="felicidadBar" class="stat-fill felicidad"></div>
+                    </div>
+                </div>
+
+                <div class="stat-bar">
+                    <div class="stat-label">
+                        <span>❤️ Vida</span>
+                        <span id="vidaValue">100</span>
+                    </div>
+                    <div class="stat-progress">
+                        <div id="vidaBar" class="stat-fill vida"></div>
+                    </div>
+                </div>
+
+                <div class="stat-bar">
+                    <div class="stat-label">
+                        <span>⚡ Energía</span>
+                        <span id="energiaValue">100</span>
+                    </div>
+                    <div class="stat-progress">
+                        <div id="energiaBar" class="stat-fill energia"></div>
+                    </div>
+                </div>
+
+                <div class="stat-bar">
+                    <div class="stat-label">
+                        <span>🍖 Hambre</span>
+                        <span id="hambreValue">0</span>
+                    </div>
+                    <div class="stat-progress">
+                        <div id="hambreBar" class="stat-fill hambre"></div>
+                    </div>
+                </div>
+
+                <div class="stat-bar">
+                    <div class="stat-label">
+                        <span>💧 Sed</span>
+                        <span id="sedValue">0</span>
+                    </div>
+                    <div class="stat-progress">
+                        <div id="sedBar" class="stat-fill sed"></div>
+                    </div>
+                </div>
+
+                <div class="stat-bar">
+                    <div class="stat-label">
+                        <span>⚖️ Peso</span>
+                        <span id="pesoValue">50</span>
+                    </div>
+                    <div class="stat-progress">
+                        <div id="pesoBar" class="stat-fill peso"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="actions">
+                <button class="action-btn feed-btn" onclick="feedPet()">
+                    <span>🍖</span>
+                    <span>Alimentar</span>
+                </button>
+                <button class="action-btn water-btn" onclick="waterPet()">
+                    <span>💧</span>
+                    <span>Dar Agua</span>
+                </button>
+                <button class="action-btn exercise-btn" onclick="exercisePet()">
+                    <span>💪</span>
+                    <span>Ejercitar</span>
+                </button>
+                <button class="action-btn status-btn" onclick="getDetailedStatus()">
+                    <span>📊</span>
+                    <span>Estado</span>
+                </button>
+                <button class="action-btn customize-btn" onclick="openCustomize()">
+                    <span>🎨</span>
+                    <span>Personalizar</span>
+                </button>
+                <button class="action-btn appearance-btn" onclick="viewAppearance()">
+                    <span>👀</span>
+                    <span>Apariencia</span>
+                </button>
+            </div>
+
+            <div id="gameMessage" class="message hidden"></div>
+        </div>
+    </div>
+
+    <!-- Panel de personalización -->
+    <div id="customizePanel" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎨 Personalizar Mascota</h3>
+                <button onclick="closeCustomize()" class="close-btn">&times;</button>
+            </div>
+
+            <div class="customize-form">
+                <input type="text" id="itemName" placeholder="Nombre del item">
+                <select id="itemType">
+                    <option value="sombrero">🎩 Sombrero</option>
+                    <option value="gafas">🕶️ Gafas</option>
+                    <option value="collar">📿 Collar</option>
+                    <option value="ropa">👕 Ropa</option>
+                    <option value="zapatos">👟 Zapatos</option>
+                    <option value="accesorio">💍 Accesorio</option>
+                    <option value="juguete">🎾 Juguete</option>
+                </select>
+                <input type="color" id="itemColor" value="#ff0000">
+                <input type="text" id="itemDescription" placeholder="Descripción (opcional)">
+                <button onclick="addItem()" class="btn-primary">Agregar Item</button>
+            </div>
+
+            <div id="itemsList" class="items-list"></div>
+        </div>
+    </div>
+
+    <!-- Panel de estado detallado -->
+    <div id="statusPanel" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 Estado Detallado</h3>
+                <button onclick="closeStatus()" class="close-btn">&times;</button>
+            </div>
+            <div id="statusContent"></div>
+        </div>
+    </div>
+
+    <!-- Panel de apariencia -->
+    <div id="appearancePanel" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👀 Apariencia Actual</h3>
+                <button onclick="closeAppearance()" class="close-btn">&times;</button>
+            </div>
+            <div id="appearanceContent"></div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loadingScreen" class="screen hidden">
+        <div class="container">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>🐾 Cargando...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/pet-renderer.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+
+</html>

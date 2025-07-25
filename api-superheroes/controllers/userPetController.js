@@ -1,6 +1,7 @@
 import express from "express";
 import Pet from "../models/petModel.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -160,6 +161,8 @@ router.post("/pets/my-pet/feed", async (req, res) => {
         }
 
         // Lógica de alimentación tipo Pou
+        const hambreAntes = pet.hambre;
+        
         if (pet.hambre <= 10) {
             // Sobrealimentación
             pet.felicidad = Math.max(0, pet.felicidad - 5);
@@ -168,10 +171,26 @@ router.post("/pets/my-pet/feed", async (req, res) => {
         } else {
             // Alimentación normal
             pet.felicidad = Math.min(100, pet.felicidad + 12);
-            pet.vida = Math.min(100, pet.vida + 8);
             pet.hambre = Math.max(0, pet.hambre - 25);
             pet.energia = Math.min(100, pet.energia + 4);
             pet.peso = Math.min(100, pet.peso + 1);
+            
+            // Recuperación de vida al alimentar
+            if (hambreAntes > 50) {
+                pet.vida = Math.min(100, pet.vida + 5);
+            }
+            
+            // Bonus por reducir hambre crítica
+            if (hambreAntes > 80 && pet.hambre < 50) {
+                pet.vida = Math.min(100, pet.vida + 2);
+            }
+        }
+        
+        // Aplicar pérdida de vida por hambre alta
+        if (pet.hambre > 70) {
+            let vidaPerdida = 2;
+            if (pet.sed > 70) vidaPerdida = 3; // Efecto combinado
+            pet.vida = Math.max(0, pet.vida - vidaPerdida);
         }
 
         pet.ultimaActualizacion = new Date().toISOString();
@@ -223,10 +242,28 @@ router.post("/pets/my-pet/water", async (req, res) => {
         }
 
         // Lógica de hidratación
+        const sedAntes = pet.sed;
+        
         pet.felicidad = Math.min(100, pet.felicidad + 4);
-        pet.vida = Math.min(100, pet.vida + 4);
         pet.sed = Math.max(0, pet.sed - 30);
         pet.energia = Math.min(100, pet.energia + 2);
+        
+        // Recuperación de vida al dar agua
+        if (sedAntes > 50) {
+            pet.vida = Math.min(100, pet.vida + 3);
+        }
+        
+        // Bonus por reducir sed crítica
+        if (sedAntes > 80 && pet.sed < 50) {
+            pet.vida = Math.min(100, pet.vida + 2);
+        }
+        
+        // Aplicar pérdida de vida por sed alta
+        if (pet.sed > 70) {
+            let vidaPerdida = 2;
+            if (pet.hambre > 70) vidaPerdida = 3; // Efecto combinado
+            pet.vida = Math.max(0, pet.vida - vidaPerdida);
+        }
         pet.ultimaActualizacion = new Date().toISOString();
 
         await pet.save();
@@ -270,6 +307,17 @@ router.post("/pets/my-pet/exercise", async (req, res) => {
         pet.peso = Math.max(0, pet.peso - 5);
         pet.hambre = Math.min(100, pet.hambre + 20);
         pet.sed = Math.min(100, pet.sed + 15);
+        
+        // Aplicar pérdida de vida si hambre o sed se vuelven críticas después del ejercicio
+        if (pet.hambre > 70 || pet.sed > 70) {
+            let vidaPerdida = 0;
+            if (pet.hambre > 70) vidaPerdida += 2;
+            if (pet.sed > 70) vidaPerdida += 2;
+            if (pet.hambre > 70 && pet.sed > 70) vidaPerdida = 3; // Efecto combinado, no acumulativo
+            pet.vida = Math.max(0, pet.vida - vidaPerdida);
+        }
+        // RESTAR VIDA POR EJERCICIO EXCESIVO
+        pet.vida = Math.max(0, pet.vida - 5);
         pet.ultimaActualizacion = new Date().toISOString();
 
         await pet.save();
@@ -381,8 +429,9 @@ router.post("/pets/my-pet/customize", async (req, res) => {
             });
         }
 
-        // Crear item sin ID manual - MongoDB asignará uno automáticamente
+        // Crear item con ID único
         const nuevoItem = {
+            id: new mongoose.Types.ObjectId().toString(),
             nombre: item.nombre,
             tipo: item.tipo,
             color: item.color || "#000000",
