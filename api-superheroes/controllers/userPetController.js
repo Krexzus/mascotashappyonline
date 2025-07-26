@@ -34,6 +34,31 @@ async function findPetByUserId(userId) {
     return pet;
 }
 
+// Función helper para aplicar pérdida de vida por descuido
+function applyHealthDecay(pet) {
+    let vidaPerdida = 0;
+    
+    // Pérdida por hambre alta
+    if (pet.hambre > 70) {
+        vidaPerdida += 2;
+    }
+    
+    // Pérdida por sed alta
+    if (pet.sed > 70) {
+        vidaPerdida += 2;
+    }
+    
+    // Efecto combinado (no acumulativo)
+    if (pet.hambre > 70 && pet.sed > 70) {
+        vidaPerdida = 3; // Máximo 3, no 4
+    }
+    
+    if (vidaPerdida > 0) {
+        pet.vida = Math.max(0, pet.vida - vidaPerdida);
+        console.log(`🔍 HEALTH DECAY - Vida reducida en ${vidaPerdida}. Nueva vida: ${pet.vida}`);
+    }
+}
+
 // GET /api/pets/my-pet - Obtener la mascota del usuario autenticado
 router.get("/pets/my-pet", async (req, res) => {
     try {
@@ -60,6 +85,10 @@ router.get("/pets/my-pet", async (req, res) => {
                 }
             });
         }
+
+        // Aplicar pérdida de vida por descuido al consultar estado
+        applyHealthDecay(pet);
+        await pet.save();
 
         res.json({
             success: true,
@@ -175,22 +204,15 @@ router.post("/pets/my-pet/feed", async (req, res) => {
             pet.energia = Math.min(100, pet.energia + 4);
             pet.peso = Math.min(100, pet.peso + 1);
             
-            // Recuperación de vida al alimentar
-            if (hambreAntes > 50) {
-                pet.vida = Math.min(100, pet.vida + 5);
+            // Recuperación de vida al alimentar (más generosa)
+            if (hambreAntes > 30) {
+                pet.vida = Math.min(100, pet.vida + 8);
             }
             
-            // Bonus por reducir hambre crítica
-            if (hambreAntes > 80 && pet.hambre < 50) {
-                pet.vida = Math.min(100, pet.vida + 2);
+            // Bonus extra por reducir hambre crítica
+            if (hambreAntes > 70 && pet.hambre < 50) {
+                pet.vida = Math.min(100, pet.vida + 5);
             }
-        }
-        
-        // Aplicar pérdida de vida por hambre alta
-        if (pet.hambre > 70) {
-            let vidaPerdida = 2;
-            if (pet.sed > 70) vidaPerdida = 3; // Efecto combinado
-            pet.vida = Math.max(0, pet.vida - vidaPerdida);
         }
 
         pet.ultimaActualizacion = new Date().toISOString();
@@ -248,21 +270,14 @@ router.post("/pets/my-pet/water", async (req, res) => {
         pet.sed = Math.max(0, pet.sed - 30);
         pet.energia = Math.min(100, pet.energia + 2);
         
-        // Recuperación de vida al dar agua
-        if (sedAntes > 50) {
-            pet.vida = Math.min(100, pet.vida + 3);
+        // Recuperación de vida al dar agua (más generosa)
+        if (sedAntes > 30) {
+            pet.vida = Math.min(100, pet.vida + 6);
         }
         
-        // Bonus por reducir sed crítica
-        if (sedAntes > 80 && pet.sed < 50) {
-            pet.vida = Math.min(100, pet.vida + 2);
-        }
-        
-        // Aplicar pérdida de vida por sed alta
-        if (pet.sed > 70) {
-            let vidaPerdida = 2;
-            if (pet.hambre > 70) vidaPerdida = 3; // Efecto combinado
-            pet.vida = Math.max(0, pet.vida - vidaPerdida);
+        // Bonus extra por reducir sed crítica
+        if (sedAntes > 70 && pet.sed < 50) {
+            pet.vida = Math.min(100, pet.vida + 4);
         }
         pet.ultimaActualizacion = new Date().toISOString();
 
@@ -308,16 +323,8 @@ router.post("/pets/my-pet/exercise", async (req, res) => {
         pet.hambre = Math.min(100, pet.hambre + 20);
         pet.sed = Math.min(100, pet.sed + 15);
         
-        // Aplicar pérdida de vida si hambre o sed se vuelven críticas después del ejercicio
-        if (pet.hambre > 70 || pet.sed > 70) {
-            let vidaPerdida = 0;
-            if (pet.hambre > 70) vidaPerdida += 2;
-            if (pet.sed > 70) vidaPerdida += 2;
-            if (pet.hambre > 70 && pet.sed > 70) vidaPerdida = 3; // Efecto combinado, no acumulativo
-            pet.vida = Math.max(0, pet.vida - vidaPerdida);
-        }
-        // RESTAR VIDA POR EJERCICIO EXCESIVO
-        pet.vida = Math.max(0, pet.vida - 5);
+        // Aplicar pérdida de vida por descuido después del ejercicio
+        applyHealthDecay(pet);
         pet.ultimaActualizacion = new Date().toISOString();
 
         await pet.save();
