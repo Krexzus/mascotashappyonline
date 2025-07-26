@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Previa de Mascotas</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            gap: 30px;
+        }
+
+        .pet-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .pet-area {
+            height: 200px;
+            background: linear-gradient(to bottom, #87CEEB, #98FB98);
+            border-radius: 15px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .pet {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #ff9ff3;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .pet:hover {
+            transform: scale(1.1);
+        }
+
+        /* Estilos específicos por tipo de mascota */
+        .pet-perro {
+            background: linear-gradient(135deg, #D2691E, #F4A460);
+            border-radius: 60% 60% 50% 50%;
+        }
+
+        .pet-gato {
+            background: linear-gradient(135deg, #696969, #A9A9A9);
+            border-radius: 50% 50% 45% 45%;
+        }
+
+        .pet-conejo {
+            background: linear-gradient(135deg, #F5F5DC, #FFFFFF);
+            border-radius: 50% 50% 60% 60%;
+        }
+
+        .pet-hamster {
+            background: linear-gradient(135deg, #DEB887, #F5DEB3);
+            border-radius: 50%;
+        }
+
+        .pet-pez {
+            background: linear-gradient(135deg, #4169E1, #87CEEB);
+            border-radius: 60% 40% 60% 40%;
+        }
+
+        .pet-face {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .eyes {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .eye {
+            width: 12px;
+            height: 12px;
+            background: black;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        /* Estados emocionales de los ojos */
+        .eye-happy {
+            background: black;
+            border-radius: 50%;
+            transform: scaleY(0.6);
+        }
+
+        .eye-sad {
+            background: black;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .eye-sad::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 8px;
+            background: #4169E1;
+            border-radius: 1px;
+        }
+
+        .eye-sick {
+            background: black;
+            border-radius: 50%;
+            transform: scaleX(0.3);
+        }
+
+        .mouth {
+            width: 18px;
+            height: 3px;
+            background: black;
+            border-radius: 2px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+        /* Estados emocionales de la boca */
+        .mouth.happy {
+            width: 25px;
+            height: 12px;
+            background: transparent;
+            border: 2px solid #228B22;
+            border-top: none;
+            border-radius: 0 0 25px 25px;
+        }
+
+        .mouth.sad {
+            width: 20px;
+            height: 10px;
+            background: transparent;
+            border: 2px solid black;
+            border-bottom: none;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .mouth.sick {
+            width: 15px;
+            height: 2px;
+            background: #8B4513;
+            border-radius: 1px;
+            opacity: 0.7;
+        }
+
+        /* Características específicas de mascotas */
+        .pet-feature {
+            position: absolute;
+            z-index: 1;
+        }
+
+        /* Características del perro */
+        .dog-ear {
+            width: 25px;
+            height: 35px;
+            background: #8B4513;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            border: 2px solid #654321;
+        }
+
+        .dog-ear.left {
+            top: -15px;
+            left: 15px;
+            transform: rotate(-30deg);
+        }
+
+        .dog-ear.right {
+            top: -15px;
+            right: 15px;
+            transform: rotate(30deg);
+        }
+
+        .dog-nose {
+            width: 8px;
+            height: 6px;
+            background: #000;
+            border-radius: 50%;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .dog-tail {
+            width: 15px;
+            height: 40px;
+            background: #8B4513;
+            border-radius: 50%;
+            right: -10px;
+            top: 40px;
+            transform: rotate(45deg);
+            animation: wag 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes wag {
+            0% {
+                transform: rotate(45deg);
+            }
+
+            100% {
+                transform: rotate(75deg);
+            }
+        }
+
+        /* Características del gato */
+        .cat-ear {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 25px solid #696969;
+        }
+
+        .cat-ear.left {
+            top: -20px;
+            left: 20px;
+        }
+
+        .cat-ear.right {
+            top: -20px;
+            right: 20px;
+        }
+
+        .cat-whiskers {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .whisker {
+            position: absolute;
+            width: 25px;
+            height: 1px;
+            background: #333;
+            border-radius: 1px;
+        }
+
+        .whisker.left-1 {
+            left: -35px;
+            top: -5px;
+            transform: rotate(-10deg);
+        }
+
+        .whisker.left-2 {
+            left: -35px;
+            top: 5px;
+            transform: rotate(10deg);
+        }
+
+        .whisker.right-1 {
+            right: -35px;
+            top: -5px;
+            transform: rotate(10deg);
+        }
+
+        .whisker.right-2 {
+            right: -35px;
+            top: 5px;
+            transform: rotate(-10deg);
+        }
+
+        .cat-tail {
+            width: 8px;
+            height: 50px;
+            background: #696969;
+            border-radius: 50%;
+            right: -5px;
+            top: 30px;
+            transform: rotate(20deg);
+            animation: catTailSway 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes catTailSway {
+            0% {
+                transform: rotate(20deg);
+            }
+
+            100% {
+                transform: rotate(-10deg);
+            }
+        }
+
+        /* Características del conejo */
+        .rabbit-ear {
+            width: 12px;
+            height: 45px;
+            background: #F5F5DC;
+            border: 2px solid #DDD;
+            border-radius: 50%;
+        }
+
+        .rabbit-ear.left {
+            top: -35px;
+            left: 30px;
+            transform: rotate(-20deg);
+        }
+
+        .rabbit-ear.right {
+            top: -35px;
+            right: 30px;
+            transform: rotate(20deg);
+        }
+
+        .rabbit-nose {
+            width: 6px;
+            height: 4px;
+            background: #FFB6C1;
+            border-radius: 50%;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .rabbit-tail {
+            width: 12px;
+            height: 12px;
+            background: #F5F5DC;
+            border: 2px solid #DDD;
+            border-radius: 50%;
+            right: -8px;
+            top: 50px;
+        }
+
+        /* Características del hámster */
+        .hamster-ear {
+            width: 15px;
+            height: 15px;
+            background: #DEB887;
+            border: 2px solid #CD853F;
+            border-radius: 50%;
+        }
+
+        .hamster-ear.left {
+            top: 10px;
+            left: 20px;
+        }
+
+        .hamster-ear.right {
+            top: 10px;
+            right: 20px;
+        }
+
+        .hamster-cheek {
+            width: 20px;
+            height: 15px;
+            background: #F5DEB3;
+            border: 1px solid #DEB887;
+            border-radius: 50%;
+        }
+
+        .hamster-cheek.left {
+            top: 45px;
+            left: 5px;
+        }
+
+        .hamster-cheek.right {
+            top: 45px;
+            right: 5px;
+        }
+
+        .hamster-tail {
+            width: 4px;
+            height: 8px;
+            background: #DEB887;
+            border-radius: 50%;
+            right: -3px;
+            top: 60px;
+        }
+
+        /* Características del pez */
+        .fish-fin {
+            width: 20px;
+            height: 30px;
+            background: #4169E1;
+            border-radius: 50% 10% 50% 10%;
+            border: 1px solid #1E90FF;
+        }
+
+        .fish-fin.left {
+            top: 45px;
+            left: -8px;
+            transform: rotate(-20deg);
+            animation: fishFinLeft 2s ease-in-out infinite alternate;
+        }
+
+        .fish-fin.right {
+            top: 45px;
+            right: -8px;
+            transform: rotate(20deg);
+            animation: fishFinRight 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes fishFinLeft {
+            0% {
+                transform: rotate(-20deg);
+            }
+
+            100% {
+                transform: rotate(-35deg);
+            }
+        }
+
+        @keyframes fishFinRight {
+            0% {
+                transform: rotate(20deg);
+            }
+
+            100% {
+                transform: rotate(35deg);
+            }
+        }
+
+        .fish-dorsal-fin {
+            width: 30px;
+            height: 15px;
+            background: #4169E1;
+            border: 1px solid #1E90FF;
+            border-radius: 50% 50% 10% 10%;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: fishDorsalFin 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes fishDorsalFin {
+            0% {
+                transform: translateX(-50%) scaleY(1);
+            }
+
+            100% {
+                transform: translateX(-50%) scaleY(0.8);
+            }
+        }
+
+        .fish-tail {
+            width: 25px;
+            height: 35px;
+            background: #4169E1;
+            border: 1px solid #1E90FF;
+            border-radius: 10% 50% 50% 10%;
+            right: -15px;
+            top: 42px;
+            animation: fishTailSwim 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes fishTailSwim {
+            0% {
+                transform: rotate(-10deg);
+            }
+
+            100% {
+                transform: rotate(10deg);
+            }
+        }
+
+        .fish-scales {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .scale {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+        }
+
+        .scale-1 {
+            top: 10px;
+            left: 15px;
+        }
+
+        .scale-2 {
+            top: 25px;
+            left: 25px;
+        }
+
+        .scale-3 {
+            top: 40px;
+            left: 10px;
+        }
+
+        .fish-bubbles {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            width: 80px;
+            height: 40px;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: bubbleFloat 3s ease-in-out infinite;
+        }
+
+        .bubble-1 {
+            width: 4px;
+            height: 4px;
+            top: 20px;
+            left: 10px;
+            animation-delay: 0s;
+        }
+
+        .bubble-2 {
+            width: 6px;
+            height: 6px;
+            top: 10px;
+            left: 25px;
+            animation-delay: 1s;
+        }
+
+        .bubble-3 {
+            width: 3px;
+            height: 3px;
+            top: 30px;
+            left: 40px;
+            animation-delay: 2s;
+        }
+
+        @keyframes bubbleFloat {
+            0% {
+                transform: translateY(0px);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: translateY(-15px);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+        }
+
+        /* Estados emocionales específicos por tipo */
+        .pet-perro.happy .dog-tail {
+            animation: wagFast 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes wagFast {
+            0% {
+                transform: rotate(30deg);
+            }
+
+            100% {
+                transform: rotate(90deg);
+            }
+        }
+
+        .pet-gato.happy .cat-tail {
+            animation: catTailHappy 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes catTailHappy {
+            0% {
+                transform: rotate(45deg);
+            }
+
+            100% {
+                transform: rotate(-20deg);
+            }
+        }
+
+        .pet-pez.happy .fish-tail {
+            animation: fishTailHappy 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes fishTailHappy {
+            0% {
+                transform: rotate(-20deg);
+            }
+
+            100% {
+                transform: rotate(20deg);
+            }
+        }
+
+        .pet-pez.happy .fish-bubbles .bubble {
+            animation-duration: 2s;
+        }
+
+        .pet.sad .pet-feature {
+            opacity: 0.7;
+        }
+
+        .pet.sick {
+            filter: grayscale(30%);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .pet.sick .pet-feature {
+            opacity: 0.5;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .mood-buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .mood-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .mood-btn.happy {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .mood-btn.sad {
+            background: #f44336;
+            color: white;
+        }
+
+        .mood-btn.sick {
+            background: #9E9E9E;
+            color: white;
+        }
+
+        .mood-btn.normal {
+            background: #2196F3;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="pet-container">
+        <div class="pet-area">
+            <div id="perro" class="pet pet-perro happy">
+                <div class="pet-face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+        </div>
+        <h3>🐕 Perro</h3>
+        <div class="mood-buttons">
+            <button class="mood-btn happy" onclick="changeMood('perro', 'happy')">Feliz</button>
+            <button class="mood-btn sad" onclick="changeMood('perro', 'sad')">Triste</button>
+            <button class="mood-btn sick" onclick="changeMood('perro', 'sick')">Enfermo</button>
+            <button class="mood-btn normal" onclick="changeMood('perro', 'normal')">Normal</button>
+        </div>
+    </div>
+
+    <div class="pet-container">
+        <div class="pet-area">
+            <div id="gato" class="pet pet-gato happy">
+                <div class="pet-face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+        </div>
+        <h3>🐱 Gato</h3>
+        <div class="mood-buttons">
+            <button class="mood-btn happy" onclick="changeMood('gato', 'happy')">Feliz</button>
+            <button class="mood-btn sad" onclick="changeMood('gato', 'sad')">Triste</button>
+            <button class="mood-btn sick" onclick="changeMood('gato', 'sick')">Enfermo</button>
+            <button class="mood-btn normal" onclick="changeMood('gato', 'normal')">Normal</button>
+        </div>
+    </div>
+
+    <div class="pet-container">
+        <div class="pet-area">
+            <div id="conejo" class="pet pet-conejo happy">
+                <div class="pet-face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+        </div>
+        <h3>🐰 Conejo</h3>
+        <div class="mood-buttons">
+            <button class="mood-btn happy" onclick="changeMood('conejo', 'happy')">Feliz</button>
+            <button class="mood-btn sad" onclick="changeMood('conejo', 'sad')">Triste</button>
+            <button class="mood-btn sick" onclick="changeMood('conejo', 'sick')">Enfermo</button>
+            <button class="mood-btn normal" onclick="changeMood('conejo', 'normal')">Normal</button>
+        </div>
+    </div>
+
+    <div class="pet-container">
+        <div class="pet-area">
+            <div id="hamster" class="pet pet-hamster happy">
+                <div class="pet-face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+        </div>
+        <h3>🐹 Hámster</h3>
+        <div class="mood-buttons">
+            <button class="mood-btn happy" onclick="changeMood('hamster', 'happy')">Feliz</button>
+            <button class="mood-btn sad" onclick="changeMood('hamster', 'sad')">Triste</button>
+            <button class="mood-btn sick" onclick="changeMood('hamster', 'sick')">Enfermo</button>
+            <button class="mood-btn normal" onclick="changeMood('hamster', 'normal')">Normal</button>
+        </div>
+    </div>
+
+    <div class="pet-container">
+        <div class="pet-area">
+            <div id="pez" class="pet pet-pez happy">
+                <div class="pet-face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+        </div>
+        <h3>🐠 Pez</h3>
+        <div class="mood-buttons">
+            <button class="mood-btn happy" onclick="changeMood('pez', 'happy')">Feliz</button>
+            <button class="mood-btn sad" onclick="changeMood('pez', 'sad')">Triste</button>
+            <button class="mood-btn sick" onclick="changeMood('pez', 'sick')">Enfermo</button>
+            <button class="mood-btn normal" onclick="changeMood('pez', 'normal')">Normal</button>
+        </div>
+    </div>
+
+    <script>
+        // Simular el sistema de características del pet-renderer
+        function addPetFeatures(petId, petType) {
+            const petElement = document.getElementById(petId);
+
+            // Limpiar características anteriores
+            const existingFeatures = petElement.querySelectorAll('.pet-feature');
+            existingFeatures.forEach(feature => feature.remove());
+
+            // Agregar características según el tipo
+            switch (petType) {
+                case 'perro':
+                    addDogFeatures(petElement);
+                    break;
+                case 'gato':
+                    addCatFeatures(petElement);
+                    break;
+                case 'conejo':
+                    addRabbitFeatures(petElement);
+                    break;
+                case 'hamster':
+                    addHamsterFeatures(petElement);
+                    break;
+                case 'pez':
+                    addFishFeatures(petElement);
+                    break;
+            }
+        }
+
+        function addDogFeatures(petElement) {
+            // Orejas de perro
+            const leftEar = document.createElement('div');
+            leftEar.className = 'pet-feature dog-ear left';
+            petElement.appendChild(leftEar);
+
+            const rightEar = document.createElement('div');
+            rightEar.className = 'pet-feature dog-ear right';
+            petElement.appendChild(rightEar);
+
+            // Nariz de perro
+            const nose = document.createElement('div');
+            nose.className = 'pet-feature dog-nose';
+            petElement.appendChild(nose);
+
+            // Cola de perro
+            const tail = document.createElement('div');
+            tail.className = 'pet-feature dog-tail';
+            petElement.appendChild(tail);
+        }
+
+        function addCatFeatures(petElement) {
+            // Orejas de gato (triangulares)
+            const leftEar = document.createElement('div');
+            leftEar.className = 'pet-feature cat-ear left';
+            petElement.appendChild(leftEar);
+
+            const rightEar = document.createElement('div');
+            rightEar.className = 'pet-feature cat-ear right';
+            petElement.appendChild(rightEar);
+
+            // Bigotes
+            const whiskers = document.createElement('div');
+            whiskers.className = 'pet-feature cat-whiskers';
+            whiskers.innerHTML = `
+                <div class="whisker left-1"></div>
+                <div class="whisker left-2"></div>
+                <div class="whisker right-1"></div>
+                <div class="whisker right-2"></div>
+            `;
+            petElement.appendChild(whiskers);
+
+            // Cola de gato
+            const tail = document.createElement('div');
+            tail.className = 'pet-feature cat-tail';
+            petElement.appendChild(tail);
+        }
+
+        function addRabbitFeatures(petElement) {
+            // Orejas largas de conejo
+            const leftEar = document.createElement('div');
+            leftEar.className = 'pet-feature rabbit-ear left';
+            petElement.appendChild(leftEar);
+
+            const rightEar = document.createElement('div');
+            rightEar.className = 'pet-feature rabbit-ear right';
+            petElement.appendChild(rightEar);
+
+            // Nariz de conejo
+            const nose = document.createElement('div');
+            nose.className = 'pet-feature rabbit-nose';
+            petElement.appendChild(nose);
+
+            // Cola pequeña
+            const tail = document.createElement('div');
+            tail.className = 'pet-feature rabbit-tail';
+            petElement.appendChild(tail);
+        }
+
+        function addHamsterFeatures(petElement) {
+            // Orejas pequeñas y redondas
+            const leftEar = document.createElement('div');
+            leftEar.className = 'pet-feature hamster-ear left';
+            petElement.appendChild(leftEar);
+
+            const rightEar = document.createElement('div');
+            rightEar.className = 'pet-feature hamster-ear right';
+            petElement.appendChild(rightEar);
+
+            // Mejillas infladas
+            const leftCheek = document.createElement('div');
+            leftCheek.className = 'pet-feature hamster-cheek left';
+            petElement.appendChild(leftCheek);
+
+            const rightCheek = document.createElement('div');
+            rightCheek.className = 'pet-feature hamster-cheek right';
+            petElement.appendChild(rightCheek);
+
+            // Cola muy pequeña
+            const tail = document.createElement('div');
+            tail.className = 'pet-feature hamster-tail';
+            petElement.appendChild(tail);
+        }
+
+        function addFishFeatures(petElement) {
+            // Aletas laterales
+            const leftFin = document.createElement('div');
+            leftFin.className = 'pet-feature fish-fin left';
+            petElement.appendChild(leftFin);
+
+            const rightFin = document.createElement('div');
+            rightFin.className = 'pet-feature fish-fin right';
+            petElement.appendChild(rightFin);
+
+            // Aleta dorsal (arriba)
+            const dorsalFin = document.createElement('div');
+            dorsalFin.className = 'pet-feature fish-dorsal-fin';
+            petElement.appendChild(dorsalFin);
+
+            // Cola de pez
+            const tail = document.createElement('div');
+            tail.className = 'pet-feature fish-tail';
+            petElement.appendChild(tail);
+
+            // Escamas decorativas
+            const scales = document.createElement('div');
+            scales.className = 'pet-feature fish-scales';
+            scales.innerHTML = `
+                <div class="scale scale-1"></div>
+                <div class="scale scale-2"></div>
+                <div class="scale scale-3"></div>
+            `;
+            petElement.appendChild(scales);
+
+            // Burbujas (efecto acuático)
+            const bubbles = document.createElement('div');
+            bubbles.className = 'pet-feature fish-bubbles';
+            bubbles.innerHTML = `
+                <div class="bubble bubble-1"></div>
+                <div class="bubble bubble-2"></div>
+                <div class="bubble bubble-3"></div>
+            `;
+            petElement.appendChild(bubbles);
+        }
+
+        function changeMood(petId, mood) {
+            const petElement = document.getElementById(petId);
+            const mouthElement = petElement.querySelector('.mouth');
+            const eyes = petElement.querySelectorAll('.eye');
+
+            // Remover TODAS las clases de estado anteriores
+            petElement.classList.remove('happy', 'sad', 'sick');
+            mouthElement.classList.remove('happy', 'sad', 'sick');
+
+            eyes.forEach(eye => {
+                eye.classList.remove('eye-happy', 'eye-sad', 'eye-sick');
+            });
+
+            // Resetear estilos inline que puedan interferir
+            mouthElement.style.transform = '';
+
+            // Agregar nueva clase de estado
+            if (mood !== 'normal') {
+                petElement.classList.add(mood);
+                mouthElement.classList.add(mood);
+
+                eyes.forEach(eye => {
+                    eye.classList.add(`eye-${mood}`);
+                });
+            }
+
+            console.log(`Cambiado a ${mood}:`, {
+                petClasses: petElement.className,
+                mouthClasses: mouthElement.className,
+                eyeClasses: eyes[0].className
+            });
+        }
+
+        // Inicializar todas las mascotas al cargar la página
+        document.addEventListener('DOMContentLoaded', function () {
+            addPetFeatures('perro', 'perro');
+            addPetFeatures('gato', 'gato');
+            addPetFeatures('conejo', 'conejo');
+            addPetFeatures('hamster', 'hamster');
+            addPetFeatures('pez', 'pez');
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Estados Emocionales Dashboard</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 400px;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            padding: 15px;
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .pet-area {
+            height: 200px;
+            background: linear-gradient(to bottom, #87CEEB, #98FB98);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pet {
+            width: 120px;
+            height: 120px;
+            border-radius: 60% 40% 60% 40%;
+            background: linear-gradient(135deg, #4169E1, #87CEEB);
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .pet-face {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .eyes {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .eye {
+            width: 12px;
+            height: 12px;
+            background: black;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .mouth {
+            width: 18px;
+            height: 3px;
+            background: black;
+            border-radius: 2px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+        .pet-info {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .pet-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .pet-type {
+            font-size: 16px;
+            color: #666;
+            text-transform: capitalize;
+            margin-bottom: 5px;
+        }
+
+        .pet-personality {
+            font-size: 14px;
+            color: #555;
+            font-weight: bold;
+            padding: 4px 8px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            text-align: center;
+            margin-top: 5px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🧪 Test Estados Emocionales</h2>
+        </div>
+
+        <div class="pet-area">
+            <div id="testPet" class="pet">
+                <div class="pet-face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div id="testMouth" class="mouth"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pet-info">
+            <div id="petName" class="pet-name">Nemo</div>
+            <div id="petType" class="pet-type">pez</div>
+            <div id="petPersonality" class="pet-personality">😐 Normal</div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="happinessSlider">Felicidad:</label>
+                <input type="range" id="happinessSlider" class="slider" min="0" max="100" value="50">
+                <div id="happinessValue" class="value-display">50</div>
+            </div>
+
+            <div class="control-group">
+                <label for="healthSlider">Vida:</label>
+                <input type="range" id="healthSlider" class="slider" min="0" max="100" value="100">
+                <div id="healthValue" class="value-display">100</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simular el sistema de pet-renderer
+        class TestPetRenderer {
+            constructor() {
+                this.petElement = document.getElementById('testPet');
+                this.mouthElement = document.getElementById('testMouth');
+            }
+
+            getEmotionalState(pet) {
+                if (pet.vida < 30) {
+                    return 'enfermo';
+                } else if (pet.felicidad >= 70) {
+                    return 'feliz';
+                } else if (pet.felicidad < 30) {
+                    return 'triste';
+                } else {
+                    return 'normal';
+                }
+            }
+
+            updatePetInfo(pet) {
+                const elements = {
+                    petName: document.getElementById('petName'),
+                    petType: document.getElementById('petType'),
+                    petPersonality: document.getElementById('petPersonality')
+                };
+
+                if (elements.petName) elements.petName.textContent = pet.nombre;
+                if (elements.petType) elements.petType.textContent = pet.tipo;
+                
+                // Mostrar estado emocional en lugar de personalidad
+                if (elements.petPersonality) {
+                    const emotionalState = this.getEmotionalState(pet);
+                    const stateEmojis = {
+                        'feliz': '😊 Feliz',
+                        'triste': '😢 Triste', 
+                        'enfermo': '🤒 Enfermo',
+                        'normal': '😐 Normal'
+                    };
+                    elements.petPersonality.textContent = stateEmojis[emotionalState] || '😐 Normal';
+                }
+            }
+
+            updatePetAppearance(pet) {
+                // Resetear clases
+                this.petElement.className = 'pet';
+                this.mouthElement.className = 'mouth';
+
+                const emotionalStateSpanish = this.getEmotionalState(pet);
+                let emotionalState = 'normal';
+                
+                // Mapear estados en español a clases CSS en inglés
+                const stateMapping = {
+                    'enfermo': 'sick',
+                    'feliz': 'happy', 
+                    'triste': 'sad',
+                    'normal': 'normal'
+                };
+                
+                emotionalState = stateMapping[emotionalStateSpanish] || 'normal';
+                
+                if (emotionalState !== 'normal') {
+                    this.petElement.classList.add(emotionalState);
+                    this.mouthElement.classList.add(emotionalState);
+                }
+
+                this.updateEyes(emotionalState);
+            }
+
+            updateEyes(emotionalState) {
+                const eyes = this.petElement.querySelectorAll('.eye');
+                
+                eyes.forEach(eye => {
+                    eye.className = 'eye';
+                    if (emotionalState !== 'normal') {
+                        eye.classList.add(`eye-${emotionalState}`);
+                    }
+                });
+            }
+        }
+
+        // CSS para estados emocionales
+        const style = document.createElement('style');
+        style.textContent = `
+            .eye-happy {
+                transform: scaleY(0.6);
+            }
+            .eye-sad {
+                position: relative;
+            }
+            .eye-sad::after {
+                content: '';
+                position: absolute;
+                top: 15px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 2px;
+                height: 8px;
+                background: #4169E1;
+                border-radius: 1px;
+            }
+            .eye-sick {
+                transform: scaleX(0.3);
+            }
+            .mouth.happy {
+                width: 25px;
+                height: 12px;
+                background: transparent;
+                border: 2px solid #228B22;
+                border-top: none;
+                border-radius: 0 0 25px 25px;
+            }
+            .mouth.sad {
+                width: 20px;
+                height: 10px;
+                background: transparent;
+                border: 2px solid black;
+                border-bottom: none;
+                border-radius: 20px 20px 0 0;
+            }
+            .mouth.sick {
+                width: 15px;
+                height: 2px;
+                background: #8B4513;
+                border-radius: 1px;
+                opacity: 0.7;
+            }
+            .pet.sick {
+                filter: grayscale(30%);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Inicializar
+        const renderer = new TestPetRenderer();
+        let currentPet = {
+            nombre: 'Nemo',
+            tipo: 'pez',
+            felicidad: 50,
+            vida: 100
+        };
+
+        function updatePet() {
+            const happiness = document.getElementById('happinessSlider').value;
+            const health = document.getElementById('healthSlider').value;
+            
+            currentPet.felicidad = parseInt(happiness);
+            currentPet.vida = parseInt(health);
+            
+            document.getElementById('happinessValue').textContent = happiness;
+            document.getElementById('healthValue').textContent = health;
+            
+            renderer.updatePetInfo(currentPet);
+            renderer.updatePetAppearance(currentPet);
+        }
+
+        // Event listeners
+        document.getElementById('happinessSlider').addEventListener('input', updatePet);
+        document.getElementById('healthSlider').addEventListener('input', updatePet);
+
+        // Inicializar
+        updatePet();
+    </script>
+</body>
+</html>

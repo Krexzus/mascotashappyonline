@@ -23,20 +23,217 @@ class PetRenderer {
         this.petElement.className = 'pet';
         this.mouthElement.className = 'mouth';
 
-        // Cambiar apariencia según felicidad
-        if (pet.felicidad >= 70) {
-            this.petElement.classList.add('happy');
-        } else if (pet.felicidad < 30) {
-            this.petElement.classList.add('sad');
-            this.mouthElement.classList.add('sad');
+        // Aplicar estilo según el tipo de mascota
+        this.petElement.classList.add(`pet-${pet.tipo}`);
+
+        // Determinar estado emocional y aplicar clases
+        const emotionalStateSpanish = this.getEmotionalState(pet);
+        let emotionalState = 'normal';
+        
+        // Mapear estados en español a clases CSS en inglés
+        const stateMapping = {
+            'enfermo': 'sick',
+            'feliz': 'happy', 
+            'triste': 'sad',
+            'normal': 'normal'
+        };
+        
+        emotionalState = stateMapping[emotionalStateSpanish] || 'normal';
+        
+        if (emotionalState !== 'normal') {
+            this.petElement.classList.add(emotionalState);
+            this.mouthElement.classList.add(emotionalState);
         }
 
-        if (pet.vida < 30) {
-            this.petElement.classList.add('sick');
-        }
+        // Actualizar ojos según el estado
+        this.updateEyes(emotionalState);
+
+        // Actualizar características específicas del tipo
+        this.updatePetTypeFeatures(pet);
 
         // Actualizar accesorios
         this.renderAccessories();
+    }
+
+    // Actualizar expresión de los ojos
+    updateEyes(emotionalState) {
+        const eyes = this.petElement.querySelectorAll('.eye');
+        
+        eyes.forEach(eye => {
+            // Resetear clases de ojos
+            eye.className = 'eye';
+            
+            // Aplicar clase según estado emocional
+            eye.classList.add(`eye-${emotionalState}`);
+        });
+    }
+
+    // Actualizar características específicas según el tipo de mascota
+    updatePetTypeFeatures(pet) {
+        if (!this.petElement || !pet) return;
+
+        // Limpiar características anteriores
+        const existingFeatures = this.petElement.querySelectorAll('.pet-feature');
+        existingFeatures.forEach(feature => feature.remove());
+
+        // Agregar características según el tipo
+        switch (pet.tipo) {
+            case 'perro':
+                this.addDogFeatures();
+                break;
+            case 'gato':
+                this.addCatFeatures();
+                break;
+            case 'conejo':
+                this.addRabbitFeatures();
+                break;
+            case 'hamster':
+                this.addHamsterFeatures();
+                break;
+            case 'pez':
+                this.addFishFeatures();
+                break;
+        }
+    }
+
+    // Características específicas para perro
+    addDogFeatures() {
+        // Orejas de perro
+        const leftEar = document.createElement('div');
+        leftEar.className = 'pet-feature dog-ear left';
+        this.petElement.appendChild(leftEar);
+
+        const rightEar = document.createElement('div');
+        rightEar.className = 'pet-feature dog-ear right';
+        this.petElement.appendChild(rightEar);
+
+        // Nariz de perro
+        const nose = document.createElement('div');
+        nose.className = 'pet-feature dog-nose';
+        this.petElement.appendChild(nose);
+
+        // Cola de perro
+        const tail = document.createElement('div');
+        tail.className = 'pet-feature dog-tail';
+        this.petElement.appendChild(tail);
+    }
+
+    // Características específicas para gato
+    addCatFeatures() {
+        // Orejas de gato (triangulares)
+        const leftEar = document.createElement('div');
+        leftEar.className = 'pet-feature cat-ear left';
+        this.petElement.appendChild(leftEar);
+
+        const rightEar = document.createElement('div');
+        rightEar.className = 'pet-feature cat-ear right';
+        this.petElement.appendChild(rightEar);
+
+        // Bigotes
+        const whiskers = document.createElement('div');
+        whiskers.className = 'pet-feature cat-whiskers';
+        whiskers.innerHTML = `
+            <div class="whisker left-1"></div>
+            <div class="whisker left-2"></div>
+            <div class="whisker right-1"></div>
+            <div class="whisker right-2"></div>
+        `;
+        this.petElement.appendChild(whiskers);
+
+        // Cola de gato
+        const tail = document.createElement('div');
+        tail.className = 'pet-feature cat-tail';
+        this.petElement.appendChild(tail);
+    }
+
+    // Características específicas para conejo
+    addRabbitFeatures() {
+        // Orejas largas de conejo
+        const leftEar = document.createElement('div');
+        leftEar.className = 'pet-feature rabbit-ear left';
+        this.petElement.appendChild(leftEar);
+
+        const rightEar = document.createElement('div');
+        rightEar.className = 'pet-feature rabbit-ear right';
+        this.petElement.appendChild(rightEar);
+
+        // Nariz de conejo
+        const nose = document.createElement('div');
+        nose.className = 'pet-feature rabbit-nose';
+        this.petElement.appendChild(nose);
+
+        // Cola pequeña
+        const tail = document.createElement('div');
+        tail.className = 'pet-feature rabbit-tail';
+        this.petElement.appendChild(tail);
+    }
+
+    // Características específicas para hámster
+    addHamsterFeatures() {
+        // Orejas pequeñas y redondas
+        const leftEar = document.createElement('div');
+        leftEar.className = 'pet-feature hamster-ear left';
+        this.petElement.appendChild(leftEar);
+
+        const rightEar = document.createElement('div');
+        rightEar.className = 'pet-feature hamster-ear right';
+        this.petElement.appendChild(rightEar);
+
+        // Mejillas infladas
+        const leftCheek = document.createElement('div');
+        leftCheek.className = 'pet-feature hamster-cheek left';
+        this.petElement.appendChild(leftCheek);
+
+        const rightCheek = document.createElement('div');
+        rightCheek.className = 'pet-feature hamster-cheek right';
+        this.petElement.appendChild(rightCheek);
+
+        // Cola muy pequeña
+        const tail = document.createElement('div');
+        tail.className = 'pet-feature hamster-tail';
+        this.petElement.appendChild(tail);
+    }
+
+    // Características específicas para pez
+    addFishFeatures() {
+        // Aletas laterales
+        const leftFin = document.createElement('div');
+        leftFin.className = 'pet-feature fish-fin left';
+        this.petElement.appendChild(leftFin);
+
+        const rightFin = document.createElement('div');
+        rightFin.className = 'pet-feature fish-fin right';
+        this.petElement.appendChild(rightFin);
+
+        // Aleta dorsal (arriba)
+        const dorsalFin = document.createElement('div');
+        dorsalFin.className = 'pet-feature fish-dorsal-fin';
+        this.petElement.appendChild(dorsalFin);
+
+        // Cola de pez
+        const tail = document.createElement('div');
+        tail.className = 'pet-feature fish-tail';
+        this.petElement.appendChild(tail);
+
+        // Escamas decorativas
+        const scales = document.createElement('div');
+        scales.className = 'pet-feature fish-scales';
+        scales.innerHTML = `
+            <div class="scale scale-1"></div>
+            <div class="scale scale-2"></div>
+            <div class="scale scale-3"></div>
+        `;
+        this.petElement.appendChild(scales);
+
+        // Burbujas (efecto acuático)
+        const bubbles = document.createElement('div');
+        bubbles.className = 'pet-feature fish-bubbles';
+        bubbles.innerHTML = `
+            <div class="bubble bubble-1"></div>
+            <div class="bubble bubble-2"></div>
+            <div class="bubble bubble-3"></div>
+        `;
+        this.petElement.appendChild(bubbles);
     }
 
     // Renderizar accesorios equipados
@@ -104,7 +301,31 @@ class PetRenderer {
 
         if (elements.petName) elements.petName.textContent = pet.nombre;
         if (elements.petType) elements.petType.textContent = pet.tipo;
-        if (elements.petPersonality) elements.petPersonality.textContent = pet.personalidad;
+        
+        // Mostrar estado emocional en lugar de personalidad
+        if (elements.petPersonality) {
+            const emotionalState = this.getEmotionalState(pet);
+            const stateEmojis = {
+                'feliz': '😊 Feliz',
+                'triste': '😢 Triste', 
+                'enfermo': '🤒 Enfermo',
+                'normal': '😐 Normal'
+            };
+            elements.petPersonality.textContent = stateEmojis[emotionalState] || '😐 Normal';
+        }
+    }
+
+    // Determinar el estado emocional basado en las estadísticas
+    getEmotionalState(pet) {
+        if (pet.vida < 30) {
+            return 'enfermo';
+        } else if (pet.felicidad >= 70) {
+            return 'feliz';
+        } else if (pet.felicidad < 30) {
+            return 'triste';
+        } else {
+            return 'normal';
+        }
     }
 
     // Actualizar barras de estadísticas

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Expresiones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .pet-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px auto;
+            width: 300px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .pet-area {
+            height: 200px;
+            background: linear-gradient(to bottom, #87CEEB, #98FB98);
+            border-radius: 15px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .pet {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #D2691E, #F4A460);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .pet-face {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .eyes {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .eye {
+            width: 12px;
+            height: 12px;
+            background: black;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        /* Estados emocionales de los ojos */
+        .eye-happy {
+            background: black;
+            border-radius: 50%;
+            transform: scaleY(0.6);
+        }
+
+        .eye-sad {
+            background: black;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .eye-sad::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 8px;
+            background: #4169E1;
+            border-radius: 1px;
+        }
+
+        .eye-sick {
+            background: black;
+            border-radius: 50%;
+            transform: scaleX(0.3);
+        }
+
+        .mouth {
+            width: 18px;
+            height: 3px;
+            background: black;
+            border-radius: 2px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+        /* Estados emocionales de la boca */
+        .mouth.happy {
+            width: 25px;
+            height: 12px;
+            background: transparent;
+            border: 2px solid #228B22;
+            border-top: none;
+            border-radius: 0 0 25px 25px;
+        }
+
+        .mouth.sad {
+            width: 20px;
+            height: 10px;
+            background: transparent;
+            border: 2px solid black;
+            border-bottom: none;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .mouth.sick {
+            width: 15px;
+            height: 2px;
+            background: #8B4513;
+            border-radius: 1px;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-normal { background: #2196F3; color: white; }
+        .btn-happy { background: #4CAF50; color: white; }
+        .btn-sad { background: #f44336; color: white; }
+        .btn-sick { background: #9E9E9E; color: white; }
+
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Expresiones Faciales</h1>
+    
+    <div class="pet-container">
+        <div class="pet-area">
+            <div id="testPet" class="pet">
+                <div class="pet-face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div id="testMouth" class="mouth"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn btn-normal" onclick="changeExpression('normal')">😐 Normal</button>
+            <button class="btn btn-happy" onclick="changeExpression('happy')">😊 Feliz</button>
+            <button class="btn btn-sad" onclick="changeExpression('sad')">😢 Triste</button>
+            <button class="btn btn-sick" onclick="changeExpression('sick')">🤒 Enfermo</button>
+        </div>
+        
+        <div id="status" class="status">
+            Estado: Normal
+        </div>
+    </div>
+
+    <script>
+        function changeExpression(mood) {
+            const petElement = document.getElementById('testPet');
+            const mouthElement = document.getElementById('testMouth');
+            const eyes = petElement.querySelectorAll('.eye');
+            const statusElement = document.getElementById('status');
+            
+            console.log('🔄 Cambiando expresión a:', mood);
+            
+            // Remover TODAS las clases de estado anteriores
+            petElement.classList.remove('happy', 'sad', 'sick');
+            mouthElement.classList.remove('happy', 'sad', 'sick');
+            
+            eyes.forEach(eye => {
+                eye.classList.remove('eye-happy', 'eye-sad', 'eye-sick');
+            });
+            
+            // Resetear estilos inline
+            mouthElement.style.transform = '';
+            
+            // Agregar nueva clase de estado
+            if (mood !== 'normal') {
+                petElement.classList.add(mood);
+                mouthElement.classList.add(mood);
+                
+                eyes.forEach(eye => {
+                    eye.classList.add(`eye-${mood}`);
+                });
+            }
+            
+            // Actualizar estado visual
+            const moodEmojis = {
+                normal: '😐',
+                happy: '😊',
+                sad: '😢',
+                sick: '🤒'
+            };
+            
+            statusElement.innerHTML = `
+                Estado: ${mood} ${moodEmojis[mood]}<br>
+                Pet classes: ${petElement.className}<br>
+                Mouth classes: ${mouthElement.className}<br>
+                Eye classes: ${eyes[0].className}
+            `;
+            
+            console.log('✅ Expresión cambiada:', {
+                petClasses: petElement.className,
+                mouthClasses: mouthElement.className,
+                eyeClasses: eyes[0].className
+            });
+        }
+        
+        // Inicializar con estado normal
+        document.addEventListener('DOMContentLoaded', function() {
+            changeExpression('normal');
+        });
+    </script>
+</body>
+</html>

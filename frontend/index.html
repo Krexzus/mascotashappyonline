@@ -103,6 +103,32 @@
             transform: scale(1.1);
         }
 
+        /* Formas específicas por tipo de mascota */
+        .pet-perro {
+            background: linear-gradient(135deg, #D2691E, #F4A460);
+            border-radius: 60% 60% 50% 50%;
+        }
+
+        .pet-gato {
+            background: linear-gradient(135deg, #696969, #A9A9A9);
+            border-radius: 50% 50% 45% 45%;
+        }
+
+        .pet-conejo {
+            background: linear-gradient(135deg, #F5F5DC, #FFFFFF);
+            border-radius: 50% 50% 60% 60%;
+        }
+
+        .pet-hamster {
+            background: linear-gradient(135deg, #DEB887, #F5DEB3);
+            border-radius: 50%;
+        }
+
+        .pet-pez {
+            background: linear-gradient(135deg, #4169E1, #87CEEB);
+            border-radius: 60% 40% 60% 40%;
+        }
+
         .pet-face {
             position: absolute;
             top: 50%;
@@ -122,15 +148,74 @@
             height: 12px;
             background: black;
             border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        /* Estados emocionales de los ojos */
+        .eye-happy {
+            background: black;
+            border-radius: 50%;
+            transform: scaleY(0.6);
+        }
+
+        .eye-sad {
+            background: black;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .eye-sad::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 8px;
+            background: #4169E1;
+            border-radius: 1px;
+        }
+
+        .eye-sick {
+            background: black;
+            border-radius: 50%;
+            transform: scaleX(0.3);
         }
 
         .mouth {
+            width: 18px;
+            height: 3px;
+            background: black;
+            border-radius: 2px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+        /* Estados emocionales de la boca */
+        .mouth.happy {
+            width: 25px;
+            height: 12px;
+            background: transparent;
+            border: 2px solid #228B22;
+            border-top: none;
+            border-radius: 0 0 25px 25px;
+        }
+
+        .mouth.sad {
             width: 20px;
             height: 10px;
+            background: transparent;
             border: 2px solid black;
-            border-top: none;
-            border-radius: 0 0 20px 20px;
-            margin: 0 auto;
+            border-bottom: none;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .mouth.sick {
+            width: 15px;
+            height: 2px;
+            background: #8B4513;
+            border-radius: 1px;
+            opacity: 0.7;
         }
 
         /* Accesorios de la mascota */
@@ -181,6 +266,417 @@
             border: 2px solid rgba(0, 0, 0, 0.2);
         }
 
+        /* Características específicas de mascotas */
+        .pet-feature {
+            position: absolute;
+            z-index: 1;
+        }
+
+        /* Características del perro */
+        .dog-ear {
+            width: 25px;
+            height: 35px;
+            background: #8B4513;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            border: 2px solid #654321;
+        }
+
+        .dog-ear.left {
+            top: -15px;
+            left: 15px;
+            transform: rotate(-30deg);
+        }
+
+        .dog-ear.right {
+            top: -15px;
+            right: 15px;
+            transform: rotate(30deg);
+        }
+
+        .dog-nose {
+            width: 8px;
+            height: 6px;
+            background: #000;
+            border-radius: 50%;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .dog-tail {
+            width: 15px;
+            height: 40px;
+            background: #8B4513;
+            border-radius: 50%;
+            right: -10px;
+            top: 40px;
+            transform: rotate(45deg);
+            animation: wag 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes wag {
+            0% { transform: rotate(45deg); }
+            100% { transform: rotate(75deg); }
+        }
+
+        /* Características del gato */
+        .cat-ear {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 25px solid #696969;
+        }
+
+        .cat-ear.left {
+            top: -20px;
+            left: 20px;
+        }
+
+        .cat-ear.right {
+            top: -20px;
+            right: 20px;
+        }
+
+        .cat-whiskers {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .whisker {
+            position: absolute;
+            width: 25px;
+            height: 1px;
+            background: #333;
+            border-radius: 1px;
+        }
+
+        .whisker.left-1 {
+            left: -35px;
+            top: -5px;
+            transform: rotate(-10deg);
+        }
+
+        .whisker.left-2 {
+            left: -35px;
+            top: 5px;
+            transform: rotate(10deg);
+        }
+
+        .whisker.right-1 {
+            right: -35px;
+            top: -5px;
+            transform: rotate(10deg);
+        }
+
+        .whisker.right-2 {
+            right: -35px;
+            top: 5px;
+            transform: rotate(-10deg);
+        }
+
+        .cat-tail {
+            width: 8px;
+            height: 50px;
+            background: #696969;
+            border-radius: 50%;
+            right: -5px;
+            top: 30px;
+            transform: rotate(20deg);
+            animation: catTailSway 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes catTailSway {
+            0% { transform: rotate(20deg); }
+            100% { transform: rotate(-10deg); }
+        }
+
+        /* Características del conejo */
+        .rabbit-ear {
+            width: 12px;
+            height: 45px;
+            background: #F5F5DC;
+            border: 2px solid #DDD;
+            border-radius: 50%;
+        }
+
+        .rabbit-ear.left {
+            top: -35px;
+            left: 30px;
+            transform: rotate(-20deg);
+        }
+
+        .rabbit-ear.right {
+            top: -35px;
+            right: 30px;
+            transform: rotate(20deg);
+        }
+
+        .rabbit-nose {
+            width: 6px;
+            height: 4px;
+            background: #FFB6C1;
+            border-radius: 50%;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .rabbit-tail {
+            width: 12px;
+            height: 12px;
+            background: #F5F5DC;
+            border: 2px solid #DDD;
+            border-radius: 50%;
+            right: -8px;
+            top: 50px;
+        }
+
+        /* Características del hámster */
+        .hamster-ear {
+            width: 15px;
+            height: 15px;
+            background: #DEB887;
+            border: 2px solid #CD853F;
+            border-radius: 50%;
+        }
+
+        .hamster-ear.left {
+            top: 10px;
+            left: 20px;
+        }
+
+        .hamster-ear.right {
+            top: 10px;
+            right: 20px;
+        }
+
+        .hamster-cheek {
+            width: 20px;
+            height: 15px;
+            background: #F5DEB3;
+            border: 1px solid #DEB887;
+            border-radius: 50%;
+        }
+
+        .hamster-cheek.left {
+            top: 45px;
+            left: 5px;
+        }
+
+        .hamster-cheek.right {
+            top: 45px;
+            right: 5px;
+        }
+
+        .hamster-tail {
+            width: 4px;
+            height: 8px;
+            background: #DEB887;
+            border-radius: 50%;
+            right: -3px;
+            top: 60px;
+        }
+
+        /* Características del pez */
+        .fish-fin {
+            width: 20px;
+            height: 30px;
+            background: #4169E1;
+            border-radius: 50% 10% 50% 10%;
+            border: 1px solid #1E90FF;
+        }
+
+        .fish-fin.left {
+            top: 45px;
+            left: -8px;
+            transform: rotate(-20deg);
+            animation: fishFinLeft 2s ease-in-out infinite alternate;
+        }
+
+        .fish-fin.right {
+            top: 45px;
+            right: -8px;
+            transform: rotate(20deg);
+            animation: fishFinRight 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes fishFinLeft {
+            0% { transform: rotate(-20deg); }
+            100% { transform: rotate(-35deg); }
+        }
+
+        @keyframes fishFinRight {
+            0% { transform: rotate(20deg); }
+            100% { transform: rotate(35deg); }
+        }
+
+        .fish-dorsal-fin {
+            width: 30px;
+            height: 15px;
+            background: #4169E1;
+            border: 1px solid #1E90FF;
+            border-radius: 50% 50% 10% 10%;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: fishDorsalFin 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes fishDorsalFin {
+            0% { transform: translateX(-50%) scaleY(1); }
+            100% { transform: translateX(-50%) scaleY(0.8); }
+        }
+
+        .fish-tail {
+            width: 25px;
+            height: 35px;
+            background: #4169E1;
+            border: 1px solid #1E90FF;
+            border-radius: 10% 50% 50% 10%;
+            right: -15px;
+            top: 42px;
+            animation: fishTailSwim 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes fishTailSwim {
+            0% { transform: rotate(-10deg); }
+            100% { transform: rotate(10deg); }
+        }
+
+        .fish-scales {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .scale {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+        }
+
+        .scale-1 {
+            top: 10px;
+            left: 15px;
+        }
+
+        .scale-2 {
+            top: 25px;
+            left: 25px;
+        }
+
+        .scale-3 {
+            top: 40px;
+            left: 10px;
+        }
+
+        .fish-bubbles {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            width: 80px;
+            height: 40px;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: bubbleFloat 3s ease-in-out infinite;
+        }
+
+        .bubble-1 {
+            width: 4px;
+            height: 4px;
+            top: 20px;
+            left: 10px;
+            animation-delay: 0s;
+        }
+
+        .bubble-2 {
+            width: 6px;
+            height: 6px;
+            top: 10px;
+            left: 25px;
+            animation-delay: 1s;
+        }
+
+        .bubble-3 {
+            width: 3px;
+            height: 3px;
+            top: 30px;
+            left: 40px;
+            animation-delay: 2s;
+        }
+
+        @keyframes bubbleFloat {
+            0% { 
+                transform: translateY(0px);
+                opacity: 0.6;
+            }
+            50% { 
+                transform: translateY(-15px);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+        }
+
+        /* Estados emocionales específicos por tipo */
+        .pet-perro.happy .dog-tail {
+            animation: wagFast 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes wagFast {
+            0% { transform: rotate(30deg); }
+            100% { transform: rotate(90deg); }
+        }
+
+        .pet-gato.happy .cat-tail {
+            animation: catTailHappy 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes catTailHappy {
+            0% { transform: rotate(45deg); }
+            100% { transform: rotate(-20deg); }
+        }
+
+        .pet-pez.happy .fish-tail {
+            animation: fishTailHappy 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes fishTailHappy {
+            0% { transform: rotate(-20deg); }
+            100% { transform: rotate(20deg); }
+        }
+
+        .pet-pez.happy .fish-bubbles .bubble {
+            animation-duration: 2s;
+        }
+
+        .pet.sad .pet-feature {
+            opacity: 0.7;
+        }
+
+        .pet.sick {
+            filter: grayscale(30%);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .pet.sick .pet-feature {
+            opacity: 0.5;
+        }
+
         /* Información de la mascota */
         .pet-info {
             text-align: center;
@@ -205,9 +701,13 @@
 
         .pet-personality {
             font-size: 14px;
-            color: #888;
-            font-style: italic;
-            text-transform: capitalize;
+            color: #555;
+            font-weight: bold;
+            padding: 4px 8px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 5px;
         }
 
         /* Estadísticas */
@@ -771,7 +1271,7 @@
             <div class="pet-info">
                 <div id="petName" class="pet-name">Mi Mascota</div>
                 <div id="petType" class="pet-type">perro</div>
-                <div id="petPersonality" class="pet-personality">normal</div>
+                <div id="petPersonality" class="pet-personality">😐 Normal</div>
             </div>
 
             <!-- Estadísticas -->
